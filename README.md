@@ -5,7 +5,13 @@
 - [Authentication](#authentication)
 - [Data Dictionaries](#data-dictionaries)
   - [Custom Dictionary](#custom-dictionary)
+  - [TSV Dictionary Files](#tsv-dictionary-files)
+  - [Update a Dictionary](#update-a-dictionary)
+  - [Delete a Dictionary](#delete-a-dictionary)
 - [Tagging](#tagging)
+  - [Tagging content files](#tagging-content-files)
+  - [Tagging Web URLs](#tagging-web-urls)
+  - [Tagging Data Streams](#tagging-data-streams)
 - [Search](#search)
 - [Export](#export)
 
@@ -341,7 +347,7 @@ curl -X DELETE \
 ```
 
 
-#### Tagging Web pages:
+#### Tagging Web URLs:
 
 Tagging can be performed on a list of URLs. All parameters in tagging files are applicable here.
 
