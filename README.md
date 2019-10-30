@@ -16,7 +16,7 @@ If the authentication is performed successfully you will receive access and refr
 
 ```
 curl -X POST \
-  http://search.quantxt.com/oauth/token \
+  http://search.api.quantxt.com/oauth/token \
   -H 'Authorization: Basic dGhlaWE7' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=password&username=CLIENT_USERNAME&password=CLIENT_PASSWORD'
@@ -51,7 +51,7 @@ with `access_toekn` and `refresh_toekn` in the body of the response:
 Access token can be refreshed by making the following call:
 ```
 curl -X POST \
-  http://search.quantxt.com/oauth/token \
+  http://search.api.quantxt.com/oauth/token \
   -H 'Authorization: Basic dGhlaWE7' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=refresh_token&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzIyNzI4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImJhMjQzMDJiLTQ1NGItNDllMC05Nzc2LTI3NDAyZWUwMTBlYiIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImF0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCJ9.MI5tC94XeOqqFMOoKE9kKF-Ek_L5x8LhskYeg33UAlk'
@@ -95,7 +95,7 @@ Create data dictionaries via `/dictionaries` end point as follows:
 
 ```
 curl -X POST \
-  http://search.quantxt.com/dictionaries \
+  http://search.api.quantxt.com/dictionaries \
   -H 'Authorization: Bearer ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -139,13 +139,11 @@ curl -X POST \
 
 Upload TSV data dictionaries via `/dictionaries/upload` end point as follows:
 
-
-
 #### Request
 
 ```
 curl -X POST \
-  http://search.quantxt.com/dictionaries/upload \
+  http://search.api.quantxt.com/dictionaries/upload \
   -H 'Authorization: Bearer ACCESS_TOKEN' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
@@ -153,24 +151,25 @@ curl -X POST \
   -F file=@/home/files/custom_dictionary.tsv
 ```
 
-#### Response
-
-Same as response for `/dictionaries`
-
 
 To retrieve an availbale dictionary perform the request below, by providing the dictionary ID:
 
+#### Request
+
 ```
 curl -X GET \
- http://search.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+ http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
  -H 'Authorization: Bearer ACCESS_TOKEN'
 ```
 
-To update existing dictionary, perform request like:
+To update an existing dictionary:
+
+#### Request
+
 ```
 curl -X PUT \
-  http://test.portal.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN'
+  http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+  -H 'Authorization: Bearer ACCESS_TOKEN'
   -d '{
 	"name": "Custom dictionary updated",
 	"entries": 
@@ -186,34 +185,42 @@ curl -X PUT \
 	]
 }'
 ```
-and again if everything is ok, expect response as in case of creating or fetching the dictionary.
 
-To delete existing dictionary, simple execute:
+To delete an existing dictionary:
+
+#### Request
+
 ```
 curl -X DELETE \
-  http://test.portal.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' 
+  http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+  -H 'Authorization: Bearer ACCESS_TOKEN' 
 ```
-and if everything is ok response will be `HTTP 200`.
 
-To fetch all existing dictionaries execute request like:
+
+To list all existing dictionaries:
+
+#### Request
+
 ```
 curl -X GET \
-  http://test.portal.quantxt.com/dictionaries \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' 
+  http://search.api.quantxt.com/dictionaries \
+  -H 'Authorization: Bearer ACCESS_TOKEN' 
 ``` 
-and response will look like:
+
+#### Response
+
 ```
 [
     {
         "id": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
             "key": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-            "name": "Custom dictionary",
+            "name": "My dictionary",
             "global": false,
         "entries": []
     }
 ]
 ```
+
 
 ### Search
 
