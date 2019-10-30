@@ -3,36 +3,26 @@
 ## Table of content
 
 - [Authentication](#authentication)
-- [Dictionaries](#dictionaries)
-- [Search](#search)
+- [Data Dictionaries](#dictionaries)
+- [Search and Tagging](#search)
 
 
 ### Authentication
-Authentication to the API is performed via HTTP Basic Auth alongside with providing the user credentials 
+Authentication to the API is performed via HTTP Basic Auth by providing the user credentials 
 in the request payload. 
-Basic authentication is used to identify the client application consuming the API. 
-If the authentication is performed with the success you will receive access and refresh JWT tokens.
+If the authentication is performed successfully you will receive access and refresh tokens.
 
 `Basic dGhlaWE7` represents Base64 encoded `CLIENT_USERNAME:CLIENT_PASSWORD` combination used for authenticating the client.
 
 ```
 curl -X POST \
-  http://test.portal.quantxt.com/oauth/token \
+  http://search.quantxt.com/oauth/token \
   -H 'Authorization: Basic dGhlaWE7' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD'
+  -d 'grant_type=password&username=CLIENT_USERNAME&password=CLIENT_PASSWORD'
 ```
 
-If the basic authentication fails, meaning that `CLIENT_USERNAME` or `CLIENT_PASSWORD` are invalid, than the response
-will be `HTTP 401`:
-```
-{
-    "error": "unauthorized",
-    "error_description": "Full authentication is required to access this resource"
-}
-```
-
-If the provided username or password is wrong, authentication will fail and return `HTTP 400` and response like:
+If the provided username or password is wrong, authentication will fail and return `HTTP 400`:
 ```
 {
     "error": "invalid_grant",
@@ -40,8 +30,8 @@ If the provided username or password is wrong, authentication will fail and retu
 }
 ```
 
-If the provided data is correct and authentication is successful, than the response will return `HTTP 200` 
-and it will contain following data:
+If authentication is successful, it will return `HTTP 200` 
+with `access_toekn` and `refresh_toekn` in the body of the response:
 ```
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzE2Njk4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.4ltfJD2tOjB5T1_yCgojZDQjYV2oU73dCz0WL6P-ML0",
@@ -50,31 +40,31 @@ and it will contain following data:
     "expires_in": 1799
 }
 ```
-`access_token` is JWT token that will be used in API calls for authorizing the requests and is valid for 30 minutes.
+`access_token` should be used in all API calls and must be refreshed every `expires_in` minutes.
 
 `token_type` indicates that this is `Bearer` (JWT) token
 
-`refresh_token` is JWT token that can be used for refreshing the access token.
+`refresh_token` is the token to be used for refreshing the `access_token`.
 
 `expires_in` indicates for how long access token is valid.
 
-Access token can be refreshed using the `refresh_token` by making a call like:
+Access token can be refreshed by making the following call:
 ```
 curl -X POST \
-  http://test.portal.quantxt.com/oauth/token \
+  http://search.quantxt.com/oauth/token \
   -H 'Authorization: Basic dGhlaWE7' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=refresh_token&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzIyNzI4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImJhMjQzMDJiLTQ1NGItNDllMC05Nzc2LTI3NDAyZWUwMTBlYiIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImF0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCJ9.MI5tC94XeOqqFMOoKE9kKF-Ek_L5x8LhskYeg33UAlk'
 ```
 
-Once you obtain valid access token, any further request to protected API resources must have it included 
-in the `Authorization` header prefixed with the token type, which is `Bearer`. Example:
+Calls to all other API end points must include the `access_token` in their header:
+
 ```
 -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzExNTQzMzksInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImY4ZTAwNmNiLWVjMTMtNDY3OC1hZWFhLTI0ZmFlMjNlMDA3ZCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.nCerUUuqVo2ag3YxNe8aiBTMyfNRtLgvNtF4vbDBgKI'
 ```
 
-If JWT access token is not provided when protected API endpoints are invoked or the token is expired, 
-than the response will be `HTTP 401`:
+If access token is missing or expired the end point will return `HTTP 401`:
+
 ```
 {
     "error": "unauthorized",
@@ -82,73 +72,99 @@ than the response will be `HTTP 401`:
 }
 ```
 
-### Dictionaries
 
-New dictionaries can be created in two ways - by providing dictionary entries in the request payload
-or by uploading a TSV file containing dictionary entries.
-To provide dictionary entries in the request payload, request should look like:
+### Data Dictionaries
+
+Data dictionaries are used for labeling. The engine will search for dictionary values in input utterances and label the matching utterance with the dictionary key:
+
+Dictionary:
+M&A => merger and acquisition
+
+Input utterance:
+Merger and acquisition report published in 2019.
+
+above will be labeled with `M&A`
+
+New dictionaries can be created in two ways: 
+- By providing dictionary entries in the request payload
+- By uploading a TSV file containing dictionary entries in format of `key<TAB>value`.
+
+Create data dictionaries via `/dictionaries` end point as follows:
+
+#### Request
+
 ```
 curl -X POST \
-  http://test.portal.quantxt.com/dictionaries \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
+  http://search.quantxt.com/dictionaries \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
-	"name": "Custom dictionary",
+	"name": "My dictionary",
 	"entries": 
 	[
 		{
-			"key": "TBD",
-			"value": "To be done"
+			"key": "M&A",
+			"value": "merger and acquisition"
 		},
 		{
-			"key": "TBD",
-			"value": "To be determined"
+			"key": "M&A",
+			"value": "take over"
 		}
 	]
 }'
 ```
-`JWT_ACCESS_TOKEN` represents the access token gained during the authentication process.
 
-If everything is ok, response will look like:
+`ACCESS_TOKEN` represents the access token gained during the authentication process.
+
+#### Response
+
 ```
 {
     "id": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
     "key": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-    "name": "Custom dictionary",
+    "name": "My dictionary",
     "global": false,
     "entries": [
         {
-            "key": "TBD",
-            "value": "To be done"
+          "key": "M&A",
+          "value": "merger and acquisition"
         },
         {
-            "key": "TBD",
-            "value": "To be determined"
+          "key": "M&A",
+          "value": "take over"
         }
     ]
 }
 ```
 
-Other option is to upload a TSV file containing dictionary entries. If the file is called for example 
-`/home/files/custom_dictionary.tsv`, than the upload request should look like:
+Upload TSV data dictionaries via `/dictionaries/upload` end point as follows:
+
+
+
+#### Request
+
 ```
 curl -X POST \
-  http://test.portal.quantxt.com/dictionaries/upload \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
+  http://search.quantxt.com/dictionaries/upload \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
   -F 'name=Uploaded dictionary' \
   -F file=@/home/files/custom_dictionary.tsv
 ```
-and if everything is ok, than expect the response as in previous case.
 
-To fetch created dictionary perform the request below, by providing the correct dictionary ID:
+#### Response
+
+Same as response for `/dictionaries`
+
+
+To retrieve an availbale dictionary perform the request below, by providing the dictionary ID:
+
 ```
 curl -X GET \
- http://test.portal.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
- -H 'Authorization: Bearer JWT_ACCESS_TOKEN'
+ http://search.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+ -H 'Authorization: Bearer ACCESS_TOKEN'
 ```
-and response will be identical to the one after creating the dictionary.
 
 To update existing dictionary, perform request like:
 ```
