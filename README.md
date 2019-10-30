@@ -229,15 +229,20 @@ curl -X GET \
 Tagging is the process of identifying and labeling entities found in the content. Tagging can be done using unsupervised models as well as using user defined data dictionaries. We will cover both approaches in below.
 
 
-Upload content .txt, .pdf and .html files for tagging via following call:
+#### Tagging content files
+
+First upload all content files for tagging via following call:
 
 #### Request
+
 ```
 curl -X POST \
-  http://test.portal.quantxt.com/search/file \
+  http://search.api.quantxt.com/search/file \
   -H 'Authorization: Bearer ACCESS_TOKEN' \
   -F file=@/Users/file.pdf
 ```
+
+PDF, TXT and HTML formats are supported.
 
 #### Response
 
@@ -252,7 +257,49 @@ curl -X POST \
 }
 ```
 
-You can also tag web pages:
+Then you can tag data via data dictionaries:
+
+#### Request
+
+```
+curl -X POST \
+  http://search.quantxt.com/search/new \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -d '{
+  "title": "My search with files and dictionaries",
+  "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
+  "dictionaries": ["user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz"]
+}'
+```
+
+`title` is optional but it is highly recommended for easier distinction between different tagging jobs.
+
+There is no limit on number of files and dictionaries that can be tagged via `/new` end point.
+
+#### Response
+
+```
+{
+    "index": "puvqrjfhqq"
+}
+```
+
+`index` represent the unique identification for the container that holds labeled data. 
+
+
+Supported parameters:
+
+`get_phrases`
+(Optional, boolean) if `true` it will use built-in Entity recognition engine.
+
+`excludeUttWithoutEntities`
+(Optional, boolean) if `true` the output only includes utterances that have at least one tag from the input dictionaries.
+
+`runSentenceDetect`
+(Optional, boolean) if `true` it will break input content unit into semantic sentences and run tagging at sentence level.
+
+
+#### Tagging Web pages:
 
 #### Request
 
@@ -263,26 +310,8 @@ curl -X POST \
 
 
 
+#### Search
 
-
-and than to perform a search request, pass previously uploaded file UUID in a request like this:
-```
-curl -X POST \
-  http://test.portal.quantxt.com/search/new \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
-  -d '{
-	"title": "Microsoft",
-	"files": ["b351283c-330c-418b-8fb7-44cf3c7a09d5"]
-}'
-```
-and if everything is ok, response should be `HTTP 201`:
-```
-{
-    "index": "puvqrjfhqq"
-}
-```
-and `index` represent the unique identification for previously performed search. It is optional to provide `title` 
-but it is recommended for easier distinction between searches.
 
 To fetch the data from performed search, simply execute request like:
 ```
@@ -341,16 +370,11 @@ Dictionary `key` can be found in a create dictionary response like this [here](#
 Other way is to [fetch all dictionaries](#dictionaries) and than find the key properties of the dictionaries 
 that should be used for search. So, using identifiers of the files and dictionaries we previously created, 
 request should look like this:
-```
-curl -X POST \
-  http://test.portal.quantxt.com/search/new \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
-  -d '{
-	"title": "My search with files and dictionaries",
-	"files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
-	"dictionaries": ["user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz"]
-}'
-```
+
+
+
+
+
 and if everything goes alright, response should be in exactly the same format as in previous search case.
 
 To perform a search on files using dictionaries and types as well, we need to append a type parameter to the dictionary,
