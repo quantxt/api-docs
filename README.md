@@ -4,6 +4,7 @@
 
 - [Authentication](#authentication)
 - [Data Dictionaries](#data-dictionaries)
+  - [Custom Dictionary](#custom-dictionary)
 - [Tagging](#tagging)
 - [Search](#search)
 - [Export](#export)
@@ -106,6 +107,9 @@ New dictionaries can be created in two ways:
 - By providing dictionary entries in the request payload
 - By uploading a TSV file containing dictionary entries in the format of `key<TAB>value`.
 
+
+#### Custom Dictionary
+
 Create data dictionaries via `/dictionaries` end point as follows:
 
 #### Request
@@ -154,6 +158,10 @@ curl -X POST \
 }
 ```
 
+
+
+#### TSV Dictionary Files
+
 Upload TSV data dictionaries via `/dictionaries/upload` endpoint as follows:
 
 #### Request
@@ -179,6 +187,9 @@ curl -X GET \
  -H 'Authorization: Bearer ACCESS_TOKEN'
 ```
 
+
+#### Update a Dictionary
+
 To update an existing dictionary:
 
 #### Request
@@ -203,6 +214,8 @@ curl -X PUT \
 }'
 ```
 
+#### Delete a Dictionary
+
 To delete an existing dictionary:
 
 #### Request
@@ -212,6 +225,9 @@ curl -X DELETE \
   http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
   -H 'Authorization: Bearer ACCESS_TOKEN' 
 ```
+
+
+#### List Dictionaries
 
 
 To list all existing dictionaries:
@@ -302,7 +318,7 @@ There is no limit on the number of files and dictionaries that can be tagged via
 `index` represents the unique identification for the container that holds output labeled data. 
 
 
-**Supported parameters:**
+**Request parameters:**
 
 `get_phrases`
 (Optional, boolean) if `true` it will use built-in Theia Entity Tagging engine.
@@ -343,6 +359,12 @@ curl -X POST \
 ```
 
 
+#### Tagging Data Streams
+
+Tagging data from data streams such as third party APIs is supported. Please contact <support@quantxt.com> for details.
+
+
+
 #### Extracting Typed Values
 
 Data dictionaries allow the user to quickly search and label thousands of phrases in unstructured content. There are cases when users want to label a keyword or phrase as an entity only if it is associated with a value. For example:
@@ -378,7 +400,7 @@ curl -X POST \
 ### Search
 
 
-To fetch the data from performed search, simply execute request like:
+The Search endpoint allows user to run full-text and [faceted search](https://en.wikipedia.org/wiki/Faceted_search) in the labeled data.
 
 #### Request
 
@@ -388,6 +410,17 @@ curl -X GET \
   -H 'Authorization: Bearer ACCESS_TOKEN' \
 ```
 
+**Request parameters:**
+
+`q`
+(Optional, string) Search query that goes againest the main content `title` field. It supports boolean `OR`, `AND` and `NOT` parameters.
+
+`f`
+(Optional, string) Query filters and must be used in pairs. Filters are created for each input dictionary. For example to include results that have one or more label from `Vehicle` dictionary the request should look like: `&f=Vehicle&f=*`. To include results that are labeled with `Ford` or `BMW` from the `Vehicle` dictionary, the request would be `&f=Vehicle&f=BMW&f=Vehicle&f=Ford`
+
+`from`
+(Optional, int) Offset for paging results. Dafaults to 0. Each page contain 20 items.
+
 
 #### Response
 
@@ -396,44 +429,35 @@ curl -X GET \
     "Total": 2610,
     "results": [
         {
-            "title": "Microsoft has pulled its plans to build a office in SF, the city confirmed on Friday.",
+            "title": "The Federal Reserve Bank of New York provides gold custody to several central banks, governments and official international organizations on behalf of the Federal Reserve System.",
             "id": "Wv8fBG4Bc3WI8L9MbaO2",
-            "link": "https://www.abc15.com/news/microsoft",
+            "link": "https://www.hamilton.edu/news/story/hamilton-nyc-program-tours-federal-reserve-museum",
             "score": 0.10268514747565982,
             "source": "abc15.com",
             "date": "2018-05-24T00:00:00.000Z",
             "tags": [
-                "City",
-                "Microsoft"
+                "Federal Reserve",
+                "New York"
             ]
         }
     ],
-    "aggs": {},
-    "meta": {
-        "title": "Microsoft",
-        "sub_title": "",
-        "source": [
-            "news"
-        ],
-        "fields": [],
-        "dateUpdated": "2018-05-24T00:00:00.000Z",
-        "numResults": 2610,
-        "progress": 100,
-        "num_doc_new": 286,
-        "num_new_res_after": 2610,
-        "took": 17272,
-        "num_new_res_before": 7145,
-        "index": "puvqrjfhqq",
-        "mode": 2,
-        "thresh": 0.3,
-        "alignScoreL": 0.1,
-        "search_terms": [
-            "microsoft"
-        ]
-    }
+    "aggs": {
+      "Tag": [{
+          "key": "Central bank",
+          "count": 878
+        }, {
+          "key": "Gold",
+          "count": 523
+        }
+      }
 }
 ```
 
+`Total`: Number of results.
+
+`result []`: The array that contains result items.
+
+`aggs` : Facets over the results with count of items for each facet.
 
 
 ### Export
@@ -449,3 +473,8 @@ curl -X GET
 ```
 
 The export output is limited to 5000 rows. All `/search` parameters can be passed here to export the desired slice of the data.
+
+
+
+For technical questions please contact <support@quantxt.com>
+
