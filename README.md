@@ -12,6 +12,7 @@
   - [Tagging content files](#tagging-content-files)
   - [Tagging Web URLs](#tagging-web-urls)
   - [Tagging Data Streams](#tagging-data-streams)
+  - [Extracting Typed Values](#extracting-typed-values)
 - [Search](#search)
 - [Export](#export)
 
