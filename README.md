@@ -3,7 +3,7 @@
 ## Table of content
 
 - [Authentication](#authentication)
-- [Data Dictionaries](#data_dictionaries)
+- [Data Dictionaries](#data-dictionaries)
 - [Tagging](#tagging)
 - [Search](#search)
 - [Export](#export)
@@ -303,12 +303,17 @@ Supported parameters:
 
 #### Request
 
+To perform a search by providing URLs as a source (instead of a file as it was case in previous examples), 
+it is enough to pass list of desired URLs as a `urls` property, like this:
 ```
 curl -X POST \
-  http://search.api.quantxt.com/search/
+  http://search.quantxt.com/search/new \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -d '{
+   "title": "My search with URLs",
+   "urls": ["https://en.wikipedia.org/wiki/Tesla", "https://en.wikipedia.org/wiki/Tesla,_Inc."]
+}'
 ```
-
-
 
 ### Search
 
