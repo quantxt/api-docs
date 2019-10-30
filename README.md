@@ -1,4 +1,4 @@
-# API Documentation
+# Theia Search API Documentation
 
 ## Table of content
 
@@ -48,9 +48,9 @@ with `access_token` and `refresh_toekn` in the body of the response:
 
 `refresh_token` is the token to be used for refreshing the `access_token`.
 
-`expires_in` indicates for how long access token is valid.
+`expires_in` indicates for how long the access token is valid.
 
-Access token can be refreshed by making the following call:
+The access token can be refreshed by making the following call:
 ```
 curl -X POST \
   http://search.api.quantxt.com/oauth/token \
@@ -65,7 +65,7 @@ Calls to all other API end points must include the `access_token` in their heade
 -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzExNTQzMzksInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImY4ZTAwNmNiLWVjMTMtNDY3OC1hZWFhLTI0ZmFlMjNlMDA3ZCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.nCerUUuqVo2ag3YxNe8aiBTMyfNRtLgvNtF4vbDBgKI'
 ```
 
-If access token is missing or expired the end point will return `HTTP 401`:
+If the access token is missing or expired the endpoint will return `HTTP 401`:
 
 ```
 {
@@ -77,7 +77,7 @@ If access token is missing or expired the end point will return `HTTP 401`:
 
 ### Data Dictionaries
 
-Data dictionaries are used for labeling. The engine will search for dictionary values in input utterances and label the matching utterance with the dictionary key:
+Data dictionaries are used for labeling. **Theia** will search for dictionary values in input utterances and label the matching utterance with the dictionary key:
 
 Dictionary:
 M&A => merger and acquisition
@@ -89,7 +89,7 @@ above will be labeled with `M&A`
 
 New dictionaries can be created in two ways: 
 - By providing dictionary entries in the request payload
-- By uploading a TSV file containing dictionary entries in format of `key<TAB>value`.
+- By uploading a TSV file containing dictionary entries in the format of `key<TAB>value`.
 
 Create data dictionaries via `/dictionaries` end point as follows:
 
@@ -154,7 +154,7 @@ curl -X POST \
 ```
 
 
-To retrieve an availbale dictionary perform the request below, by providing the dictionary ID:
+To retrieve an available dictionary perform the request below, by providing the dictionary ID:
 
 #### Request
 
@@ -226,12 +226,12 @@ curl -X GET \
 
 ### Tagging
 
-Tagging is the process of identifying and labeling entities found in the content. Tagging can be done using unsupervised models as well as using user defined data dictionaries. We will cover both approaches in below.
+Tagging is the process of identifying and labeling entities found in the content. Tagging can be done using unsupervised models as well as using user-defined data dictionaries. We will cover both approaches in below.
 
 
 #### Tagging content files
 
-First upload all content files for tagging via following call:
+First, upload all content files for tagging via the following call:
 
 #### Request
 
@@ -274,7 +274,7 @@ curl -X POST \
 
 `title` is optional but it is highly recommended for easier distinction between different tagging jobs.
 
-There is no limit on number of files and dictionaries that can be tagged via `/new` end point.
+There is no limit on the number of files and dictionaries that can be tagged via `/new` end-point.
 
 #### Response
 
@@ -284,47 +284,99 @@ There is no limit on number of files and dictionaries that can be tagged via `/n
 }
 ```
 
-`index` represent the unique identification for the container that holds labeled data. 
+`index` represents the unique identification for the container that holds labeled data. 
 
 
 Supported parameters:
 
 `get_phrases`
-(Optional, boolean) if `true` it will use built-in Entity recognition engine.
+(Optional, boolean) if `true` it will use built-in Entity tagging engine.
 
 `excludeUttWithoutEntities`
 (Optional, boolean) if `true` the output only includes utterances that have at least one tag from the input dictionaries.
 
 `runSentenceDetect`
-(Optional, boolean) if `true` it will break input content unit into semantic sentences and run tagging at sentence level.
+(Optional, boolean) if `true` it will break the input content unit into semantic sentences and run tagging at the sentence level.
+
+
+To delete a data container:
+
+#### Request
+
+```
+curl -X DELETE \
+  http://search.api.quantxt.com/search/puvqrjfhqq \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
+```
 
 
 #### Tagging Web pages:
 
+Tagging can be performed on a list of URLs. All parameters in tagging files are applicable here.
+
 #### Request
 
-To perform a search by providing URLs as a source (instead of a file as it was case in previous examples), 
-it is enough to pass list of desired URLs as a `urls` property, like this:
+
 ```
 curl -X POST \
   http://search.quantxt.com/search/new \
   -H 'Authorization: Bearer ACCESS_TOKEN' \
   -d '{
    "title": "My search with URLs",
-   "urls": ["https://en.wikipedia.org/wiki/Tesla", "https://en.wikipedia.org/wiki/Tesla,_Inc."]
+   "urls": ["https://electrek.co/2019/10/29/tesla-model-3-first-electric-car-approved-nyc-yellow-cab/", 
+            "https://www.cnbc.com/2019/10/20/electric-car-prices-finally-in-reach-of-millennial-gen-z-buyers.html"]
 }'
 ```
+
+
+#### Extracting Typed Values
+
+Data dictionaries allow the user to quickly search and label thousands of phrases in unstructured content. There are cases when users want to label a keyword or phrase as an entity only if it is associated with a value. For example:
+
+A "release => "Manufactured" dictionary item will label both of the following utterances:
+
+> The first automobile in the US **released** by Ford
+> The first automobile in the US **released** in 1908 by Ford
+
+However, if the user is looking for only release year of the car makers the first utterance won't have much use for him. He can only label the second utterance using a **Typed Dictionary**.
+
+Supported dictionary types at the moment are:
+
+`INT, REGEX, DOUBLE, DATETIME, NOUN, VERB, PERCENT, MONEY`
+
+If a Type is set, a dictionary item will be labeled only if a type is found in its close proximity.
+In the above example, user can set the Type to `INT` to identify **1908** that is in close proximity of **released**
+
+#### Request
+
+```
+curl -X POST \
+  http://search.api.quantxt.com/search/new \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -d '{
+  "title": "My search with dictionaries and types",
+  "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
+  "dictionaries": ["user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz||INT"]
+}'
+```
+
 
 ### Search
 
 
 To fetch the data from performed search, simply execute request like:
+
+#### Request
+
 ```
 curl -X GET \
-  http://test.portal.quantxt.com/search/puvqrjfhqq \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
+  http://search.api.quantxt.com/search/puvqrjfhqq \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
 ```
-and response should be in form:
+
+
+#### Response
+
 ```
 {
     "Total": 2610,
@@ -367,42 +419,17 @@ and response should be in form:
     }
 }
 ```
-Results can also be exported in XLSX or PDF format by simply performing `GET` requests to:
-`http://test.portal.quantxt.com/reports/lcjjoghfwk/xlsx` or `http://test.portal.quantxt.com/reports/lcjjoghfwk/pdf` respectively.
-
-To perform a search on files using dictionaries, all that is required is to provide a specific dictionaries keys. 
-Dictionary `key` can be found in a create dictionary response like this [here](#dictionaries). 
-Other way is to [fetch all dictionaries](#dictionaries) and than find the key properties of the dictionaries 
-that should be used for search. So, using identifiers of the files and dictionaries we previously created, 
-request should look like this:
 
 
 
+### Export
 
+Results can also be exported in XLSX format by performing `GET` requests to:
 
-and if everything goes alright, response should be in exactly the same format as in previous search case.
-
-To perform a search on files using dictionaries and types as well, we need to append a type parameter to the dictionary,
- separated by the `||`.
-In that case, request should look like:
 ```
-curl -X POST \
-  http://test.portal.quantxt.com/search/new \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
-  -d '{
-	"title": "My search with files, dictionaries and types",
-	"files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
-	"dictionaries": ["user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz||DOUBLE"]
-}'
+curl -X GET
+    http://search.api.quantxt.com/reports/puvqrjfhqq/xlsx \
+    -H 'Authorization: Bearer ACCESS_TOKEN'
 ```
-and again, if everything is ok, response will be the same as in previous search cases.
-Supported types at the moment are:
-`SHORT, INT, LONG, FLOAT, DOUBLE, STRING, KEYWORD, BOOL, DATETIME, NOUN, VERB, PERCENT, MONEY, NONE`.
 
-To delete the search, simply perform delete request like:
-```
-curl -X DELETE \
-  http://test.api.quantxt.com/search/puvqrjfhqq \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
-```
-where `puvqrjfhqq` represents the search `index`. If everything is ok, `HTTP 200` will be returned.
+The export output is limited to 5000 rows. All `/search` parameters can be passed here to export the desired slice of the data.
