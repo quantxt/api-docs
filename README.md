@@ -3,8 +3,10 @@
 ## Table of content
 
 - [Authentication](#authentication)
-- [Data Dictionaries](#dictionaries)
-- [Search and Tagging](#search)
+- [Data Dictionaries](#data_dictionaries)
+- [Tagging](#tagging)
+- [Search](#search)
+- [Export](#export)
 
 
 ### Authentication
@@ -19,7 +21,7 @@ curl -X POST \
   http://search.api.quantxt.com/oauth/token \
   -H 'Authorization: Basic dGhlaWE7' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'grant_type=password&username=CLIENT_USERNAME&password=CLIENT_PASSWORD'
+  -d 'grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD'
 ```
 
 If the provided username or password is wrong, authentication will fail and return `HTTP 400`:
@@ -31,7 +33,7 @@ If the provided username or password is wrong, authentication will fail and retu
 ```
 
 If authentication is successful, it will return `HTTP 200` 
-with `access_toekn` and `refresh_toekn` in the body of the response:
+with `access_token` and `refresh_toekn` in the body of the response:
 ```
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzE2Njk4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.4ltfJD2tOjB5T1_yCgojZDQjYV2oU73dCz0WL6P-ML0",
@@ -222,17 +224,23 @@ curl -X GET \
 ```
 
 
-### Search
+### Tagging
 
-To perform a search by providing the file as a data source, next steps should be performed:
-1. First upload a desired file (for example file `/Users/file.pdf`)with data to be searched by performing a request like:
+Tagging is the process of identifying and labeling entities found in the content. Tagging can be done using unsupervised models as well as using user defined data dictionaries. We will cover both approaches in below.
+
+
+Upload content .txt, .pdf and .html files for tagging via following call:
+
+#### Request
 ```
 curl -X POST \
   http://test.portal.quantxt.com/search/file \
-  -H 'Authorization: Bearer JWT_ACCESS_TOKEN' \
+  -H 'Authorization: Bearer ACCESS_TOKEN' \
   -F file=@/Users/file.pdf
 ```
-and if everything goes ok, response will look like:
+
+#### Response
+
 ```
 {
     "uuid": "c351283c-330c-418b-8fb7-44cf3c7a09d5",
@@ -243,6 +251,20 @@ and if everything goes ok, response will look like:
     "source": "file.pdf"
 }
 ```
+
+You can also tag web pages:
+
+#### Request
+
+```
+curl -X POST \
+  http://search.api.quantxt.com/search/
+```
+
+
+
+
+
 and than to perform a search request, pass previously uploaded file UUID in a request like this:
 ```
 curl -X POST \
