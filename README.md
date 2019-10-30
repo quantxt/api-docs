@@ -10,11 +10,10 @@
 
 
 ### Authentication
-Authentication to the API is performed via HTTP Basic Auth by providing the user credentials 
-in the request payload. 
-If the authentication is performed successfully you will receive access and refresh tokens.
 
-`Basic dGhlaWE7` represents Base64 encoded `CLIENT_USERNAME:CLIENT_PASSWORD` combination used for authenticating the client.
+Authentication is performed via HTTP Basic Auth by providing the user credentials.
+
+#### Request
 
 ```
 curl -X POST \
@@ -24,16 +23,12 @@ curl -X POST \
   -d 'grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD'
 ```
 
-If the provided username or password is wrong, authentication will fail and return `HTTP 400`:
-```
-{
-    "error": "invalid_grant",
-    "error_description": "Bad credentials"
-}
-```
+`Basic dGhlaWE7` represents Base64 encoded `CLIENT_USERNAME:CLIENT_PASSWORD` combination used for authenticating the client.
 
-If authentication is successful, it will return `HTTP 200` 
-with `access_token` and `refresh_toekn` in the body of the response:
+If authentication is successful, it will return `HTTP 200`  with `access_token` and `refresh_toekn` in the body of the response.
+
+#### Response
+
 ```
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzE2Njk4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.4ltfJD2tOjB5T1_yCgojZDQjYV2oU73dCz0WL6P-ML0",
@@ -42,15 +37,32 @@ with `access_token` and `refresh_toekn` in the body of the response:
     "expires_in": 1799
 }
 ```
-`access_token` should be used in all API calls and must be refreshed every `expires_in` minutes.
 
-`token_type` indicates that this is `Bearer` (JWT) token
+`access_token`: The token to be used for all API calls and must be refreshed in every `expires_in` minutes.
 
-`refresh_token` is the token to be used for refreshing the `access_token`.
+`token_type`: Ondicates that this is `Bearer` token.
 
-`expires_in` indicates for how long the access token is valid.
+`refresh_token`: The token to be used for refreshing the `access_token`.
 
-The access token can be refreshed by making the following call:
+`expires_in`: The duration for validity of the `access_token` in minutes.
+
+
+If the provided username or password is wrong, authentication will fail and return `HTTP 400`:
+
+#### Response
+
+```
+{
+    "error": "invalid_grant",
+    "error_description": "Bad credentials"
+}
+```
+
+
+The access token can be refreshed by calling `/oauth/token` endpoint:
+
+#### Request
+
 ```
 curl -X POST \
   http://search.api.quantxt.com/oauth/token \
@@ -67,6 +79,8 @@ Calls to all other API end points must include the `access_token` in their heade
 
 If the access token is missing or expired the endpoint will return `HTTP 401`:
 
+#### Response
+
 ```
 {
     "error": "unauthorized",
@@ -79,13 +93,14 @@ If the access token is missing or expired the endpoint will return `HTTP 401`:
 
 Data dictionaries are used for labeling. **Theia** will search for dictionary values in input utterances and label the matching utterance with the dictionary key:
 
-Dictionary:
+Dictionary (one item):
 M&A => merger and acquisition
 
 Input utterance:
-Merger and acquisition report published in 2019.
 
-above will be labeled with `M&A`
+>Merger and acquisition report published in 2019.
+
+The above will be labeled with `M&A`
 
 New dictionaries can be created in two ways: 
 - By providing dictionary entries in the request payload
@@ -139,7 +154,7 @@ curl -X POST \
 }
 ```
 
-Upload TSV data dictionaries via `/dictionaries/upload` end point as follows:
+Upload TSV data dictionaries via `/dictionaries/upload` endpoint as follows:
 
 #### Request
 
@@ -226,7 +241,7 @@ curl -X GET \
 
 ### Tagging
 
-Tagging is the process of identifying and labeling entities found in the content. Tagging can be done using unsupervised models as well as using user-defined data dictionaries. We will cover both approaches in below.
+Tagging (or labeling) is the process of identifying and labeling entities found in the unstructured content. Tagging can be done using unsupervised models as well as using user-defined data dictionaries. We will cover both approaches in below.
 
 
 #### Tagging content files
@@ -284,13 +299,13 @@ There is no limit on the number of files and dictionaries that can be tagged via
 }
 ```
 
-`index` represents the unique identification for the container that holds labeled data. 
+`index` represents the unique identification for the container that holds output labeled data. 
 
 
-Supported parameters:
+**Supported parameters:**
 
 `get_phrases`
-(Optional, boolean) if `true` it will use built-in Entity tagging engine.
+(Optional, boolean) if `true` it will use built-in Theia Entity Tagging engine.
 
 `excludeUttWithoutEntities`
 (Optional, boolean) if `true` the output only includes utterances that have at least one tag from the input dictionaries.
@@ -315,7 +330,6 @@ curl -X DELETE \
 Tagging can be performed on a list of URLs. All parameters in tagging files are applicable here.
 
 #### Request
-
 
 ```
 curl -X POST \
@@ -425,6 +439,8 @@ curl -X GET \
 ### Export
 
 Results can also be exported in XLSX format by performing `GET` requests to:
+
+#### Request
 
 ```
 curl -X GET
