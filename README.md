@@ -310,7 +310,7 @@ curl -X POST \
 
 
 
-#### Search
+### Search
 
 
 To fetch the data from performed search, simply execute request like:
