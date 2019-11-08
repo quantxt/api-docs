@@ -19,22 +19,16 @@
 
 ### Authentication
 
-Authentication is performed using API key.
+All Calls to protected API end points must include a header `X-Api-Key` with a valid API key.
 
-
-Calls to all protected API end points must include header `X-Api-Key` with valid API key.
-
-Example of calling a user profile endpoint (replace SECRET_API_KEY with actual API key):
 #### Request
 
 ```
-curl -X GET \
-  http://search.api.quantxt.com/users/profile \
-  -H 'X-Api-Key: SECRET_API_KEY' 
+  -H 'X-Api-Key: API_KEY' 
 ```
 If API key is valid than the response will be `HTTP 200` containing user profile data.
 
-If the access API key is missing or invalid, protected endpoint will return `HTTP 401` like this:
+If API key is missing or not valid the endpoint will return `HTTP 401`:
 
 #### Response
 
