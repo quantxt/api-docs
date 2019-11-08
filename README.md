@@ -19,73 +19,22 @@
 
 ### Authentication
 
-Authentication is performed via HTTP Basic Auth by providing the user credentials.
+Authentication is performed using API key.
 
+
+Calls to all protected API end points must include header `X-Api-Key` with valid API key.
+
+Example of calling a user profile endpoint (replace SECRET_API_KEY with actual API key):
 #### Request
 
 ```
-curl -X POST \
-  http://search.api.quantxt.com/oauth/token \
-  -H 'Authorization: Basic dGhlaWE7' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD'
+curl -X GET \
+  http://search.api.quantxt.com/users/profile \
+  -H 'X-Api-Key: SECRET_API_KEY' 
 ```
+If API key is valid than the response will be `HTTP 200` containing user profile data.
 
-`Basic dGhlaWE7` represents Base64 encoded `CLIENT_USERNAME:CLIENT_PASSWORD` combination used for authenticating the client.
-
-If authentication is successful, it will return `HTTP 200`  with `access_token` and `refresh_toekn` in the body of the response.
-
-#### Response
-
-```
-{
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzE2Njk4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.4ltfJD2tOjB5T1_yCgojZDQjYV2oU73dCz0WL6P-ML0",
-    "token_type": "bearer",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzIyNzI4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImJhMjQzMDJiLTQ1NGItNDllMC05Nzc2LTI3NDAyZWUwMTBlYiIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImF0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCJ9.MI5tC94XeOqqFMOoKE9kKF-Ek_L5x8LhskYeg33UAlk",
-    "expires_in": 1799
-}
-```
-
-`access_token`: The token to be used for all API calls and must be refreshed in every `expires_in` minutes.
-
-`token_type`: Ondicates that this is `Bearer` token.
-
-`refresh_token`: The token to be used for refreshing the `access_token`.
-
-`expires_in`: The duration for validity of the `access_token` in minutes.
-
-
-If the provided username or password is wrong, authentication will fail and return `HTTP 400`:
-
-#### Response
-
-```
-{
-    "error": "invalid_grant",
-    "error_description": "Bad credentials"
-}
-```
-
-
-The access token can be refreshed by calling `/oauth/token` endpoint:
-
-#### Request
-
-```
-curl -X POST \
-  http://search.api.quantxt.com/oauth/token \
-  -H 'Authorization: Basic dGhlaWE7' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'grant_type=refresh_token&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzIyNzI4OTcsInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImJhMjQzMDJiLTQ1NGItNDllMC05Nzc2LTI3NDAyZWUwMTBlYiIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImF0aSI6IjQ5ODA1YjkxLTBhYjItNDlmZS1hMzM1LWJkMDQ0NGJkOTNlNCJ9.MI5tC94XeOqqFMOoKE9kKF-Ek_L5x8LhskYeg33UAlk'
-```
-
-Calls to all other API end points must include the `access_token` in their header:
-
-```
--H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJleHAiOjE1NzExNTQzMzksInVzZXJfbmFtZSI6InN1cGVydXNlckBxdWFudHh0LmNvbSIsImp0aSI6ImY4ZTAwNmNiLWVjMTMtNDY3OC1hZWFhLTI0ZmFlMjNlMDA3ZCIsImNsaWVudF9pZCI6InRoZWlhIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.nCerUUuqVo2ag3YxNe8aiBTMyfNRtLgvNtF4vbDBgKI'
-```
-
-If the access token is missing or expired the endpoint will return `HTTP 401`:
+If the access API key is missing or invalid, protected endpoint will return `HTTP 401` like this:
 
 #### Response
 
@@ -124,7 +73,7 @@ Create data dictionaries via `/dictionaries` end point as follows:
 ```
 curl -X POST \
   http://search.api.quantxt.com/dictionaries \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
 	"name": "My dictionary",
@@ -142,7 +91,6 @@ curl -X POST \
 }'
 ```
 
-`ACCESS_TOKEN` represents the access token gained during the authentication process.
 
 #### Response
 
@@ -176,7 +124,7 @@ Upload TSV data dictionaries via `/dictionaries/upload` endpoint as follows:
 ```
 curl -X POST \
   http://search.api.quantxt.com/dictionaries/upload \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
   -F 'name=Uploaded dictionary' \
@@ -191,7 +139,7 @@ To retrieve an available dictionary perform the request below, by providing the 
 ```
 curl -X GET \
  http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
- -H 'Authorization: Bearer ACCESS_TOKEN'
+ -H 'X-Api-Key: SECRET_API_KEY'
 ```
 
 
@@ -204,7 +152,7 @@ To update an existing dictionary:
 ```
 curl -X PUT \
   http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
-  -H 'Authorization: Bearer ACCESS_TOKEN'
+  -H 'X-Api-Key: SECRET_API_KEY'
   -d '{
 	"name": "Custom dictionary updated",
 	"entries": 
@@ -230,7 +178,7 @@ To delete an existing dictionary:
 ```
 curl -X DELETE \
   http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
-  -H 'Authorization: Bearer ACCESS_TOKEN' 
+  -H 'X-Api-Key: SECRET_API_KEY'
 ```
 
 
@@ -244,7 +192,7 @@ To list all existing dictionaries:
 ```
 curl -X GET \
   http://search.api.quantxt.com/dictionaries \
-  -H 'Authorization: Bearer ACCESS_TOKEN' 
+  -H 'X-Api-Key: SECRET_API_KEY'
 ``` 
 
 #### Response
@@ -276,7 +224,7 @@ First, upload all content files for tagging via the following call:
 ```
 curl -X POST \
   http://search.api.quantxt.com/search/file \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
   -F file=@/Users/file.pdf
 ```
 
@@ -302,7 +250,7 @@ Then you can tag data via data dictionaries:
 ```
 curl -X POST \
   http://search.quantxt.com/search/new \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
   -d '{
   "title": "My search with files and dictionaries",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
@@ -344,7 +292,7 @@ To delete a data container:
 ```
 curl -X DELETE \
   http://search.api.quantxt.com/search/puvqrjfhqq \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY'
 ```
 
 
@@ -357,7 +305,7 @@ Tagging can be performed on a list of URLs. All parameters in tagging files are 
 ```
 curl -X POST \
   http://search.quantxt.com/search/new \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
   -d '{
    "title": "My search with URLs",
    "urls": ["https://electrek.co/2019/10/29/tesla-model-3-first-electric-car-approved-nyc-yellow-cab/", 
@@ -395,7 +343,7 @@ In the above example, user can set the Type to `INT` to identify **1908** that i
 ```
 curl -X POST \
   http://search.api.quantxt.com/search/new \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
   -d '{
   "title": "My search with dictionaries and types",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
@@ -414,7 +362,7 @@ The Search endpoint allows user to run full-text and [faceted search](https://en
 ```
 curl -X GET \
   http://search.api.quantxt.com/search/puvqrjfhqq \
-  -H 'Authorization: Bearer ACCESS_TOKEN' \
+  -H 'X-Api-Key: SECRET_API_KEY' \
 ```
 
 **Request parameters:**
@@ -476,7 +424,7 @@ Results can also be exported in XLSX format by performing `GET` requests to:
 ```
 curl -X GET
     http://search.api.quantxt.com/reports/puvqrjfhqq/xlsx \
-    -H 'Authorization: Bearer ACCESS_TOKEN'
+    -H 'X-Api-Key: SECRET_API_KEY'
 ```
 
 The export output is limited to 5000 rows. All `/search` parameters can be passed here to export the desired slice of the data.
