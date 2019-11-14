@@ -408,6 +408,35 @@ curl -X GET \
 
 `aggs` : Facets over the results with count of items for each facet.
 
+### Search progress
+
+The Progress endpoint allows user to check the progress of his searches:
+
+#### Request
+
+```
+curl -X GET
+    http://search.api.quantxt.com/search/progress \
+    -H 'X-Api-Key: SECRET_API_KEY'
+```
+
+The search result is a list of searches with current progress, like this:
+```
+[
+    {
+        "index": "cjaejhvtao",
+        "progress": 36,
+        "progress_msg": "Collecting data..."
+    }
+]
+
+```
+`index` Unique search ID
+
+`progress` Search progress in %
+
+`progress_msg` Progress info message
+
 
 ### Export
 
