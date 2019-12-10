@@ -400,7 +400,7 @@ The Search endpoint allows user to run full-text and [faceted search](https://en
 ```
 curl -X GET \
   http://search.api.quantxt.com/search/puvqrjfhqq \
-  -H 'X-Api-Key: API_KEY' \
+  -H 'X-Api-Key: API_KEY'
 ```
 
 **Request parameters:**
