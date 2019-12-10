@@ -354,7 +354,7 @@ Supported types for associated entities are:
 
 
 If a Type is set, a dictionary item will be extracted only if a type is found in its close proximity.
-In the above example, user can set the Type to `INT` to identify **1908** that is in close proximity of **released**
+In the above example, user can set *vocabValueType* in the request to `DOUBLE` to identify **1908** only if it is associated with the entity **released**
 
 #### Request
 
@@ -379,12 +379,16 @@ curl -X POST \
 
 `searchMode`
 (Optional, string): Matching strategy for entity values. Possible values:
-    `SPAN`: All words of a multi word entity must be found near each other but order does not matter. Default value.
+    `SPAN` (Default): All words of a multi word entity must be found near each other but order does not matter.
     `ORDERED_SPAN`: All words of a multi word entity must be found near each and in order.
 
 
 `analyzeStrategy`
-(Optional, string): Default is `STEM`
+(Optional, string): Text normalization for matching:
+    `STEM` (Default): Remove function words (at, in, a, etc) from the phrases, lowercase, remove punctuations and and normalize all words to their stem for matching. *Analyzing* will become *analyz* and *Apple (The Company)* will become *apple company* before matching againest dictionary entities. This is a typical text preprocessing method in several applications. However it can result in unexpected behaviors in some cases.
+    `STANDARD`: Lowercase and removal of punctuations.
+    `EXACT`: Exact matching on dictionary entities.
+
 
 ### Search
 
