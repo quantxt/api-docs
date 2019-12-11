@@ -1,13 +1,11 @@
 ## Theia API documentations; Overview and Definitions
 
-**Theia** is a managed solution to mine and retrieve Entities* or Typed Entities** out of unstructured data. The following goes over details of submitting data mining jobs via a RESTful API. 
+**Theia** is a managed solution to mine and retrieve Entities* or Typed Entities** out of unstructured data. In the following we cover details of configuring and submitting data mining jobs via a RESTful API. 
 
 
 ***Entity** : An entity is a word or phrase and *can be* associated with a meaning. For example, "AWS" is an entity and it can be associated with "Amazon Inc."
 
 ****Typed Entity** : An entity that is meaningful only if it co-occurs with a number or date or another entity. For example, "Net Revenue" is considered a Typed Entity only if it is found in a context where the actual revenue dollar value is reported:
-
-
 
 
 
