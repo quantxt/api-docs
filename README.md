@@ -1,7 +1,7 @@
 # Theia REST API Documentation
 
 
-### Important Definitions
+## Overview and Definitions
 
 **Entity** : An entity is a word or phrase and *can be* associated with a meaning. For example, "AWS" is an entity and it can be associated with "Amazon Inc."
 
@@ -9,6 +9,7 @@
 
 
 **Theia** is a managed solution to mine and retrieve Entities or Typed Entities out of unstructured data. The following goes over details of submitting data mining jobs via a RESTful API. 
+
 
 
 ## Table of content
