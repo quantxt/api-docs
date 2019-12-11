@@ -1,5 +1,6 @@
 # Theia Search API Documentation
 
+
 ## Table of content
 
 - [Authentication](#authentication)
@@ -15,8 +16,9 @@
   - [Mining Web URLs](#mining-web-urls)
   - [Mining Data Streams](#mining-data-streams)
   - [Extracting Typed Entities](#extracting-typed-entities)
-- [Search](#search)
-- [Export](#export)
+  - [Status Monitoring](#status-monitoring)
+- [Searching in the Results](#searching-in-the-results)
+- [Exporting the Results](#exporting-the-results)
 
 
 ### Authentication
@@ -352,6 +354,7 @@ Supported types for associated entities are:
 
 `REGEX`, `DOUBLE`, `DATETIME`
 
+types are passed via `vocabValueType` parameter.
 
 If a Type is set, a dictionary item will be extracted only if a type is found in its close proximity.
 In the above example, user can set *vocabValueType* in the request to `DOUBLE` to identify **1908** only if it is associated with the entity **released**
@@ -368,32 +371,54 @@ curl -X POST \
   "dictionaries": [
     {
       "vocabPath" : "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-      "vocabValueType": "DOUBLE",
-      "searchMode": "SPAN",
-      "analyzeStrategy" : "STEM"
+      "vocabValueType": "DOUBLE"
     }
   ]
 }'
 ```
 
+`vocabPath` (Required): The path to entity dictionary. Path is returned either after creation of a new dictionary or via listing existing dictionaries.
 
-`searchMode`
-(Optional, string): Matching strategy for entity values. Possible values:
-    `SPAN` (Default): All words of a multi word entity must be found near each other but order does not matter.
-    `ORDERED_SPAN`: All words of a multi word entity must be found near each and in order.
+`vocabValueType` (Optional): If set, the engine will extract only entites that are associated with a entity of this type.
 
 
-`analyzeStrategy`
-(Optional, string): Text normalization for matching:
-    `STEM` (Default): Remove function words (at, in, a, etc) from the phrases, lowercase, remove punctuations and and normalize all words to their stem for matching. *Analyzing* will become *analyz* and *Apple (The Company)* will become *apple company* before matching againest dictionary entities. This is a typical text preprocessing method in several applications. However it can result in unexpected behaviors in some cases.
-    `STANDARD`: Lowercase and removal of punctuations.
-    `EXACT`: Exact matching on dictionary entities.
+#### Status Monitoring
+
+The Progress endpoint allows user to check the progress of a submitted data mining job:
+
+#### Request
+
+```
+curl -X GET
+    http://search.api.quantxt.com/search/progress \
+    -H 'X-Api-Key: API_KEY'
+```
+
+The search result is a array of active data mining jobs:
+
+```
+[
+    {
+        "index": "cjaejhvtao",
+        "progress": 36,
+        "progress_msg": "Collecting data..."
+    }
+]
+
+```
+
+`index` Unique ID of the running job
+
+`progress`  Progress in %. a number between 0 to 100.
+
+`progress_msg` (Optional) Progress message.
 
 
-### Search
+
+### Searching in the Results
 
 
-The Search endpoint allows user to run full-text and [faceted search](https://en.wikipedia.org/wiki/Faceted_search) in the labeled data.
+The Search endpoint allows user to run full-text and [faceted search](https://en.wikipedia.org/wiki/Faceted_search) in the extracted data.
 
 #### Request
 
@@ -413,6 +438,9 @@ curl -X GET \
 
 `from`
 (Optional, int) Offset for paging results. Dafaults to 0. Each page contain 20 items.
+
+`size`
+(Optional, int) Number of results to return. Maximum is 200.
 
 
 #### Response
@@ -452,37 +480,8 @@ curl -X GET \
 
 `aggs` : Facets over the results with count of items for each facet.
 
-### Search progress
 
-The Progress endpoint allows user to check the progress of his searches:
-
-#### Request
-
-```
-curl -X GET
-    http://search.api.quantxt.com/search/progress \
-    -H 'X-Api-Key: API_KEY'
-```
-
-The search result is a list of searches with current progress, like this:
-```
-[
-    {
-        "index": "cjaejhvtao",
-        "progress": 36,
-        "progress_msg": "Collecting data..."
-    }
-]
-
-```
-`index` Unique search ID
-
-`progress` Search progress in %
-
-`progress_msg` Progress info message
-
-
-### Export
+### Exporting the Results
 
 Results can also be exported in XLSX format by performing `GET` requests to:
 
