@@ -1,5 +1,6 @@
 # Theia Search API Documentation
 
+The following
 
 ## Table of content
 
@@ -19,6 +20,8 @@
   - [Status Monitoring](#status-monitoring)
 - [Searching in the Results](#searching-in-the-results)
 - [Exporting the Results](#exporting-the-results)
+  -[Exporting in Excel Format](#exporting-in-excel-format)
+  -[Exporting in JSON](#exporting-in-json)
 
 
 ### Authentication
@@ -485,6 +488,8 @@ curl -X GET \
 
 Results can also be exported in XLSX format by performing `GET` requests to:
 
+#### Exporting in Excel Format
+
 #### Request
 
 ```
@@ -493,8 +498,19 @@ curl -X GET
     -H 'X-Api-Key: API_KEY'
 ```
 
-The export output is limited to 5000 rows. All `/search` parameters can be passed here to export the desired slice of the data.
+The output which is in binary must be saved in ".xlsx" format.
 
+#### Exporting in JSON
+
+#### Request
+
+```
+curl -X GET
+    http://search.api.quantxt.com/reports/puvqrjfhqq/json \
+    -H 'X-Api-Key: API_KEY'
+```
+
+The export output is limited to 5000. All `/search` parameters can be passed here to export the desired slice of the data.
 
 
 For technical questions please contact <support@quantxt.com>
