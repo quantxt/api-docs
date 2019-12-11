@@ -5,10 +5,9 @@
 
 ***Entity** : An entity is a word or phrase and *can be* associated with a meaning. For example, "AWS" is an entity and it can be associated with "Amazon Inc."
 
-****Typed Entity** : An entity that is meaningful only if it co-occurs with a number or date or another entity. For example, "Net Revenue" is considered a Typed Entity only if it is found in a context where the actual revenue dollar value is reported:
+****Typed Entity** : An entity that is meaningful only if it co-occurs with a number or date or another entity. For example, "Revenue" is considered a Typed Entity only if it is found in a context where the actual dollar value is reported:
 
-
-
+>Amazon Inc reported $68.8 billion in revenue.
 
 ## Table of content
 
