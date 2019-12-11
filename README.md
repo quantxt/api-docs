@@ -1,11 +1,19 @@
-# Theia Search API Documentation
+# Theia REST API Documentation
 
-The following
+
+### Important Definitions
+
+**Entity** : An entity is a word or phrase and *can be* associated with a meaning. For example, "AWS" is an entity and it can be associated with "Amazon Inc."
+
+**Typed Entity** : An entity that is meaningful only if it co-occurs with a number or date or another entity. For example, "Net Revenue" is considered a Typed Entity only if it is found in a context where the actual revenue dollar value is reported:
+
+
+**Theia** is a managed solution to mine and retrieve Entities or Typed Entities out of unstructured data. The following goes over details of submitting data mining jobs via a RESTful API. 
+
 
 ## Table of content
 
 - [Authentication](#authentication)
-- [Definitions](#definitions)
 - [Data Dictionaries](#data-dictionaries)
   - [Create a New Dictionary](#create-a-new-dictionary)
   - [Uplaod a TSV Dictionary File](#uplaod-a-tsv-dictionary-file)
@@ -46,12 +54,6 @@ If API key is missing or not valid the endpoint will return `HTTP 401`:
 }
 ```
 
-
-### Definitions
-
-**Entity** : An entity is a word or phrase and *can be* associated with a meaning. For example, "AWS" is an entity and it can be associated with "Amazon Inc."
-
-**Typed Entity** : An entity that is meaningful only if it co-occurs with a number or date or another entity. For example, "Net Revenue" is considered a Typed Entity only if it is found in a context where the actual revenue dollar value is reported:
 
 "Net Revenue" is a Typed Entity:
 
