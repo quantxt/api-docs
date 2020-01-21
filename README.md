@@ -150,8 +150,6 @@ Upload TSV data dictionaries via `/dictionaries/upload` endpoint as follows:
 curl -X POST \
   http://search.api.quantxt.com/dictionaries/upload \
   -H 'X-Api-Key: API_KEY' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
   -F 'name=Uploaded dictionary' \
   -F file=@/home/files/custom_dictionary.tsv
 ```
@@ -225,9 +223,9 @@ curl -X GET \
 [
     {
         "id": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
-            "key": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-            "name": "My dictionary",
-            "global": false,
+        "key": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
+        "name": "My dictionary",
+        "global": false,
         "entries": []
     }
 ]
@@ -278,11 +276,18 @@ curl -X POST \
   -d '{
   "title": "My data mining with files and dictionaries",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
-  "dictionaries": ["user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz"]
+  "searchDictionaries": [
+        { 
+            "vocabPath": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
+            "vocabValueType": "NONE"
+        }
+  ]
 }'
 ```
 
 `title` is optional but it is highly recommended for easier distinction between different tagging jobs.
+
+`vocabValueType` can have one of the following values: `NONE`, `STRING`, `DOUBLE`, `DATETIME`, 
 
 **There is no limit on the number of files and dictionaries that can be processed via `/new` end-point.**
 
@@ -290,7 +295,20 @@ curl -X POST \
 
 ```
 {
-    "index": "puvqrjfhqq"
+    "index": "puvqrjfhqq",
+    "title": "My data mining with files and dictionaries",
+    "get_phrases": true,
+    "maxTokenPerUtt": 35,
+    "minTokenPerUtt": 6,
+    "excludeUttWithoutEntities": false,
+    "stitle": null,
+    "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
+    "searchDictionaries": [
+        { 
+            "vocabPath": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
+            "vocabValueType": "NONE"
+        }
+    ]
 }
 ```
 
@@ -305,6 +323,14 @@ curl -X POST \
 `excludeUttWithoutEntities`
 (Optional, boolean) if `true` the output only includes chunks that have at least one label from the input dictionaries.
 
+`get_phrases`
+ (Optional, boolean) if `true` auto tagging will be performed.
+ 
+`minTokenPerUtt` (Optional, int)
+ 
+`maxTokenPerUtt` (Optional, int) 
+
+`stitle` (Optional, string) Override command.
 
 To delete a data container:
 
@@ -371,7 +397,7 @@ curl -X POST \
   -d '{
   "title": "My search with dictionaries and types",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
-  "dictionaries": [
+  "searchDictionaries": [
     {
       "vocabPath" : "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
       "vocabValueType": "DOUBLE"
@@ -382,7 +408,7 @@ curl -X POST \
 
 `vocabPath` (Required): The path to entity dictionary. Path is returned either after creation of a new dictionary or via listing existing dictionaries.
 
-`vocabValueType` (Optional): If set, the engine will extract only entites that are associated with a entity of this type.
+`vocabValueType` (Optional): If set, the engine will extract only entities that are associated with a entity of this type.
 
 
 #### Status Monitoring
@@ -417,6 +443,26 @@ The search result is a array of active data mining jobs:
 `progress_msg` (Optional) Progress message.
 
 
+It is also possible to check the progress of a specific data mining job:
+
+#### Request
+
+```
+curl -X GET
+    http://search.api.quantxt.com/search/progress/cjaejhvtao \
+    -H 'X-Api-Key: API_KEY'
+```
+
+#### Response
+
+```
+{
+    "index": "cjaejhvtao",
+    "progress": 36,
+    "progress_msg": "Collecting data..."
+}
+```
+
 
 ### Searching in the Results
 
@@ -434,7 +480,7 @@ curl -X GET \
 **Request parameters:**
 
 `q`
-(Optional, string) Search query that goes againest the main content `title` field. It supports boolean `OR`, `AND` and `NOT` parameters.
+(Optional, string) Search query that goes against the main content `title` field. It supports boolean `OR`, `AND` and `NOT` parameters.
 
 `f`
 (Optional, string) Query filters and must be used in pairs. Filters are created for each input dictionary. For example to include results that have one or more label from `Vehicle` dictionary the request should look like: `&f=Vehicle&f=*`. To include results that are labeled with `Ford` or `BMW` from the `Vehicle` dictionary, the request would be `&f=Vehicle&f=BMW&f=Vehicle&f=Ford`
