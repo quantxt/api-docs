@@ -175,7 +175,8 @@ To update an existing dictionary:
 ```
 curl -X PUT \
   http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
-  -H 'X-Api-Key: API_KEY'
+  -H 'X-Api-Key: API_KEY' \
+  -H 'Content-Type: application/json' \
   -d '{
 	"name": "Custom dictionary updated",
 	"entries": 
@@ -273,6 +274,7 @@ Then you can mine data via dictionaries:
 curl -X POST \
   http://search.quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
+  -H 'Content-Type: application/json' \
   -d '{
   "title": "My data mining with files and dictionaries",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
@@ -353,6 +355,7 @@ Mining can be performed on a list of URLs. All parameters in tagging files are a
 curl -X POST \
   http://search.quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
+  -H 'Content-Type: application/json' \
   -d '{
    "title": "My search with URLs",
    "urls": ["https://electrek.co/2019/10/29/tesla-model-3-first-electric-car-approved-nyc-yellow-cab/", 
@@ -394,6 +397,7 @@ In the above example, user can set *vocabValueType* in the request to `DOUBLE` t
 curl -X POST \
   http://search.api.quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
+  -H 'Content-Type: application/json' \
   -d '{
   "title": "My search with dictionaries and types",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
