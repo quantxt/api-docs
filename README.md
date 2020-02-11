@@ -414,6 +414,29 @@ curl -X POST \
 
 `vocabValueType` (Optional): If set, the engine will extract only entities that are associated with a entity of this type.
 
+To make Theia extract entities using a regular expression *vocabValueType* needs to be set to `REGEX`. You also need to provide the actual regular expression as well as the capturing groups:
+
+
+#### Request
+
+```
+curl -X POST \
+  http://search.api.quantxt.com/search/new \
+  -H 'X-Api-Key: API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "title": "My search with dictionaries and types",
+  "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
+  "searchDictionaries": [
+    {
+      "vocabPath" : "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
+      "vocabValueType": "REGEX",
+      "phraseMatchingPattern": "([A-Z]{3})\\-([A-Z0-9]+)(\\d)",
+      "phraseMatchingGroups": ["1" , "3"]
+    }
+  ]
+}'
+```
 
 #### Status Monitoring
 
