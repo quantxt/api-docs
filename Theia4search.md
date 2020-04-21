@@ -56,6 +56,13 @@
 &nbsp;
 &nbsp;
 
+### Delete an existing model.
+
+**DELETE** `/{id}`
+
+&nbsp;
+&nbsp;
+
 ### Healthchecks
 
 #### Service status
