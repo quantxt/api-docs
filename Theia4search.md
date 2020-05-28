@@ -5,7 +5,7 @@
 | --------- | ---- | -------- | ---------|
 |`c` | Model unique identifier | Request Parameter| Yes|
 |`file` | Input CSV data file | Request Parameter |Yes|
-|`search_cols` | 0-based comma separated columns from the CSV input that needs to be searchable |Yes|
+|`search_cols` | Comma separated columns from the CSV input that needs to be searchable | Request Parameter|Yes|
 |`thresh` | Search score threshold. Default is 0. | Request Parameter| No|
 |`fuzzy_length` | Minimum word length for fuzzy matching Default is 3.| Request Parameter |No|
 |`stoplist` | Input stop word file | Request Parameter |No|
