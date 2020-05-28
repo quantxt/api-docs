@@ -1,3 +1,11 @@
+Theia is a stanalone, single node full text search engine. It takes the input content in form of csv, indexes the content and provide an end point to search through the content.
+&nbsp;
+
+Unlike other search engines, Theia does not require configuring tokenizers and/or text analyzers for exact or fuzzy matching as it is all handled automatically and optimized on the content.
+&nbsp;
+
+Each row in the input CSV is considered one instance. Each row must have an integer ID in first column and some searchable content (aka text) in column[2] or after. column[1] can not contain searchable content.
+
 ### Create a new model
 **POST** `/init`
 
@@ -5,7 +13,7 @@
 | --------- | ---- | -------- | ---------|
 |`c` | Model unique identifier | Request Parameter| Yes|
 |`file` | Input CSV data file | Request Parameter |Yes|
-|`search_cols` | Comma separated columns from the CSV input that needs to be searchable | Request Parameter|Yes|
+|`cols` | Comma separated columns from the CSV input that needs to be searchable | Request Parameter|Yes|
 |`thresh` | Search score threshold. Default is 0. | Request Parameter| No|
 |`fuzzy_length` | Minimum word length for fuzzy matching Default is 3.| Request Parameter |No|
 |`stoplist` | Input stop word file | Request Parameter |No|
