@@ -26,11 +26,10 @@ Dictionary phrases and Numbers or dates or regular expressions must appear in se
 
 ### Examples
 
-| Input | Dictionary | Extraction Type | Output |
+| Input | Dictionary Phrase List | Extraction Type | Output |
 |-------|------------|-----------------|--------|
-|Subscription revenue was $201.5 million , an increase of 36% year-over-year.|`name`:`Subscription` 
-`entries`: `[ “Subscription revenue” ]` | Number | `Subscription` : `201,500,000`|
-
+|Subscription revenue was $201.5 million , an increase of 36% year-over-year.| Subscription revenue | Number | `201,500,000`|
+| <table><tr><td>Activity Date</td><td>Due Date</td></tr></table>| Activity Date | Date | `201,500,000`|
 
 
 In the following we cover details of configuring and submitting extraction jobs via a RESTful API. 
