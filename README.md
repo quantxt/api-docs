@@ -28,7 +28,7 @@ Dictionary phrases and Numbers or dates or regular expressions must appear in se
 
 | Input | Dictionary Phrase List | Extraction Type | Output |
 |-------|------------|-----------------|--------|
-|Subscription revenue was $201.5 million , an increase of 36% year-over-year.| Subscription revenue | Number | `201,500,000`|
+|Revenue was $201.5 million , an increase of 36% year-over-year.| revenue | Number | `201,500,000`|
 | <table><tr><td>Activity Date</td><td>Due Date</td><td>Amount</td></tr><tr><td>July 25, 2019</td><td>October 23, 2010</td><td>$117,000</td></tr> </table>| Activity Date | Date | `07/25/2019`|
 |Fuel Consumption:  18.1 L/100km| Consumption | Regex ([\d\\.]+) .*?100km| `18.1`|
 Gas Consumption is 23.1 L per 100km| Consumption | Regex ([\d\\.]+) .*?100km| `23.1`|
