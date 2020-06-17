@@ -1,7 +1,7 @@
 ## Theia API documentations; Overview and Definitions
 
 
-**Theia** is a semantic data extraction tool. Theia can read PDF, HTML, Ms Excel, CSV and plain text documents and extract information in structured format using _dictionaries_. It is important to understand dictionaries and their utility in extraction context:
+**Theia** is a semantic data extraction tool that can read PDF, HTML, Ms Excel, CSV and plain text documents and extract information in structured format using _dictionaries_. It is important to understand _dictionaries_ their utility in extraction context:
 
 ### Dictionary
 
@@ -16,12 +16,12 @@ Searching for dictionary phrases in the content is based on the techniques used 
 
 Each dictionary can have one of the following 4 extraction types:
 
-1. **None** (or null type): Just search for the phrases. This is mainly used for Tagging documents.
-2. **Number**: Search for the phrases AND a number in proximity to the phrase.
-3. **Date**: Search for the phrases AND a date in proximity to the phrase.
-4. **Regex**: Search for the phrases AND a custom regular expression in proximity to the phrase.
+1. **None** (or null type): Just search for the phrases and mark them if found. This is mainly used for Tagging documents.
+2. **Number**: Search for the phrases AND a number in proximity to the found phrases.
+3. **Date**: Search for the phrases AND a date in proximity to the found phrases.
+4. **Regex**: Search for the phrases AND a custom regular expression in proximity to the found phrases.
 
-Dictionary phrases and Numbers or dates or regular expressions must appear in semantic order, either in a sentence or in a table. By default the phrase and the type should appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
+Dictionary phrases and types must appear in semantic order, either in a sentence or in a table. By default **Theia** expects the phrase and the type to appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
 
 
 ### Examples
@@ -45,8 +45,8 @@ In the following we cover details of configuring and submitting extraction jobs 
   - [Create a New Dictionary](#create-a-new-dictionary)
   - [Uplaod a TSV Dictionary File](#uplaod-a-tsv-dictionary-file)
   - [Update an Existing Dictionary](#update-an-existing-dictionary)
-  - [Delete a Dictionary](#delete-a-dictionary)
-  - [List Available Dictionaries](#list-available-dictionaries)
+  - [Delete a Dictionary](#delete-an-existing-dictionary)
+  - [List Existing Dictionaries](#list-existing-dictionaries)
 - [Data Extraction](#data-extraction)
   - [Extraction Files](#extraction-from-files)
   - [Extraction from Web URLs](#extraction-from-web-urls)
@@ -100,8 +100,6 @@ Dictionaries are a list of phrases used for searching in input documents. Each e
 `category` (optional) and is only produced if the found phrase was associated with a category.
 `dict_name` assigned by user when creating a dictionary
 `dict_id` returned by **Theia** once a dictionary is created.
-
-The `str` is a search phrase and the `category` is the actual word or phrase that represents the entity.
 
 
 **Theia** uses various strategies for matching on dictionary phrases allowing users to configure the fuzziness of search. User can also provide a list synonyms and stop phrases for the value matching. For example, user can only have "Apple Inc" as one phrase in the dictionary and provide "inc", "corp", "corporation" and "company" as synonyms, allowing you to find all occurrences of "Apple the Company", "Apple Corporations" and "Apple Corp" in the content.
@@ -169,7 +167,7 @@ curl -X POST \
 ```
 
 
-#### Fetch an existing dictionary:
+#### Fetch an Existing Dictionary:
 
 #### Request
 
@@ -207,7 +205,7 @@ curl -X PUT \
 }'
 ```
 
-#### Delete a Dictionary
+#### Delete an Existing Dictionary
 
 To delete an existing dictionary:
 
@@ -248,7 +246,7 @@ curl -X GET \
 
 ### Data Extraction
 
-Data Extraction is the process of identifying search phrases found in the input documents along with extraction types (date, number or regex) using dictionaries and formatting it into structured format. Input documents can be streamed from content files, data APIs or directly from public URLs.
+Data Extraction is the process of identifying search phrases found in the input documents along with extraction types (date, number or regex) and producing structured data. Input documents can be streamed from content files, data APIs or directly from public URLs.
 
 
 #### Extraction from Files
@@ -285,12 +283,13 @@ PDF, TXT, XLS, XLSX, CSV and HTML formats are supported.
 
 ```
 curl -X POST \
-  http://quantxt.com/search/new \
+  http://api.quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
   "title": "My data mining with files and dictionaries",
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
+  "chunk" : "PAGE",
   "searchDictionaries": [
         { 
             "vocabId": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
@@ -302,11 +301,17 @@ curl -X POST \
 
 `vocabId` (required) id of the dictionary
 
-`title` (optional) but it is highly recommended for easier distinction between different tagging jobs.
+`title` (optional) but it is highly recommended for distinction between different jobs.
 
-`vocabValueType` (optional) and can be one of the following values: `NUMBER`, `DATETIME`, `REGEX`
+`vocabValueType` (optional) and can be `NUMBER` or `DATETIME` or `REGEX`. If `REGEX` is set user needs to provide the look up regular expression via `phraseMatchingPattern`. The following pattern matches on social securities numbers:
 
-**There is no limit on the number of files and dictionaries that can be processed via `/new` end-point.**
+```json
+{ 
+    "vocabId": "758345h-a0ff-45d0-b12a-2fb93af1a9ad",
+    "vocabValueType": "REGEX",
+    "phraseMatchingPattern" : "(\d{3}-\d{2}-\d{4})",
+}
+```
 
 #### Response
 
@@ -331,10 +336,11 @@ curl -X POST \
 **Request parameters:**
 
 `chunk`
-(Optional, string) can be `SENTENCE` or `PAGE` or `NONE`. This will result in splitting data into semantic chunks before processing. For example, this allow user to split the content of an article in semantic sentences and apply entity dictionaries at sentence level.
+(Optional, string) can be `SENTENCE` or `PAGE` or `NONE`. This will result in splitting input documents into semantic chunks before extraction.
 
 
-To delete a data container:
+
+To delete a completed extraction job result set:
 
 #### Request
 
@@ -353,7 +359,7 @@ Mining can be performed on a list of URLs. All parameters in tagging files are a
 
 ```
 curl -X POST \
-  http://quantxt.com/search/new \
+  http://api.quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -366,6 +372,7 @@ curl -X POST \
 
 **Theia can process both static and dynamic web pages. However, a number of websites build mechanisms to block internet bots. Theia built-in Web parser is not designed to bypass such blocking mechanisms**
 
+
 #### Extraction from Data Streams
 
 Extraction data from streams or third party data APIs is supported. Please contact <support@quantxt.com> for details.
@@ -373,7 +380,7 @@ Extraction data from streams or third party data APIs is supported. Please conta
 
 #### Status Monitoring
 
-The Progress endpoint allows user to check the progress of a submitted data mining job:
+The progress endpoint allows user to check the progress of all extraction jobs:
 
 #### Request
 
@@ -382,8 +389,6 @@ curl -X GET
     http://api.quantxt.com/search/progress \
     -H 'X-Api-Key: API_KEY'
 ```
-
-The search result is a array of active data mining jobs:
 
 ```
 [
@@ -403,7 +408,7 @@ The search result is a array of active data mining jobs:
 `progress_msg` (Optional) Progress message.
 
 
-It is also possible to check the progress of a specific data mining job:
+It is also possible to check the progress of a specific job:
 
 #### Request
 
