@@ -1,18 +1,33 @@
 ## Theia API documentations; Overview and Definitions
 
-**Theia** is a managed solution to mine and retrieve Entities* or Typed Entities** out of unstructured data. In the following we cover details of configuring and submitting data mining jobs via a RESTful API. 
+
+**Theia** is a semantic data extraction tool. Theia can read PDF, Ms Excel, CSV and plain text documents and extract information using extraction dictionaries. In the following we cover details of configuring and submitting extraction jobs via a RESTful API. 
+
+***Dictionary***
+
+In the simplest case, a dictionary is a list of phrases. Theia search for every phrase in the dictionary in the input documents and based on the extraction type results decide to extract information. 
+At a minimum, a dictionary must have a Name and at least one entry (one search phrase).
+Users can also assign categories to dictionary entries. 
+
+Searching for dictionary phrases in the content is based on the techniques used in modern search engines. Users can use various text analyzers, synonyms, stop words and fuzziness. All of this will be explained in the examples.
 
 
-***Entity** : An entity is a word or phrase and *can be* associated with a meaning. For example, "AWS" is an entity and it can be associated with "Amazon Inc."
+***Extraction Types***
 
-****Typed Entity** : An entity that is meaningful only if it co-occurs with a number or date or another entity. For example, "Revenue" is considered a Typed Entity only if it is found in a context where the actual dollar value is reported:
+Each dictionary can have one of the following extraction types:
 
->Amazon Inc reported $68.8 billion in revenue.
+* None (or null type): Just search for the phrases. This is mainly used for Tagging documents.
+* Number: Search for the phrases AND a number in proximity to the phrase.
+* Date: Search for the phrases AND a date in proximity to the phrase.
+* Regex: Search for the phrases AND a custom regular expression in proximity to the phrase.
+
+Dictionary phrases and Numbers or dates or regular expressions must appear in semantic order, either in a sentence or in a table. By default the phrase and the type should appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
+
 
 ## Table of content
 
 - [Authentication](#authentication)
-- [Data Dictionaries](#data-dictionaries)
+- [Dictionaries](#dictionaries)
   - [Create a New Dictionary](#create-a-new-dictionary)
   - [Uplaod a TSV Dictionary File](#uplaod-a-tsv-dictionary-file)
   - [Update an Existing Dictionary](#update-an-existing-dictionary)
@@ -66,14 +81,14 @@ If API key is missing or not valid the endpoint will return `HTTP 401`:
 ```
 
 
-### Entity Dictionaries
+### Dictionaries
 
-Entity dictionaries are simply a list of entities that can be used in a data mining task. Each item of a entity dictionary has a `key` and a `value`. The `key` is the associated or normalized phrase and the `value` is the actual word or phrase that represents the entity.
+Dictionaries are simply a list of phrases that are. Each item of a dictionary has a `str` and a `category`. The `str` is a search phrase and the `category` is the actual word or phrase that represents the entity.
 
 **Theia** scans all input utterances for every word or phrase in the dictionary and, if found, map it to the associated value:
 
 Dictionary (one item):
-```M&A => merger and acquisition```
+```merger and acquisition => M&A```
 
 Input utterance:
 
@@ -81,7 +96,7 @@ Input utterance:
 
 The above will be labeled with `M&A`
 
-**Theia** uses various strategies for matching on dictionary values allowing users to configure the fuzziness of search. User can also provide a list synonyms and stop phrases for the value matching. For example, you can only have "Apple Inc" as one entity in your dictionary and provide "inc", "corp", "corporation" and "company" as synonyms, allowing you to find all occurrences of "Apple the Company", "Apple Corporations" and "Apple Corp" in the content.
+**Theia** uses various strategies for matching on dictionary phrases allowing users to configure the fuzziness of search. User can also provide a list synonyms and stop phrases for the value matching. For example, user can only have "Apple Inc" as one phrase in the dictionary and provide "inc", "corp", "corporation" and "company" as synonyms, allowing you to find all occurrences of "Apple the Company", "Apple Corporations" and "Apple Corp" in the content.
 
 
 Entity dictionaries can be created in two ways: 
