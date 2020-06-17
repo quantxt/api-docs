@@ -28,7 +28,8 @@ Dictionary phrases and Numbers or dates or regular expressions must appear in se
 
 | Input | Dictionary | Extraction Type | Output |
 |-------|------------|-----------------|--------|
-|Subscription revenue was $201.5 million , an increase of 36% year-over-year.|`name`   → `Subscription` `entries` → `[ “Subscription revenue” ]` | Number | `Subscription` → `201,500,000`|
+|Subscription revenue was $201.5 million , an increase of 36% year-over-year.|`name`:`Subscription` 
+`entries`: `[ “Subscription revenue” ]` | Number | `Subscription` : `201,500,000`|
 
 
 
