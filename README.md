@@ -1,7 +1,7 @@
 ## Theia API documentations; Overview and Definitions
 
 
-**Theia** is a semantic data extraction tool. Theia can read PDF, Ms Excel, CSV and plain text documents and extract information using _dictionaries_. It is important to understand dictionaries and their utility in extraction context:
+**Theia** is a semantic data extraction tool. Theia can read PDF, HTML, Ms Excel, CSV and plain text documents and extract information in structured format using _dictionaries_. It is important to understand dictionaries and their utility in extraction context:
 
 ###Dictionary
 
@@ -14,12 +14,12 @@ Searching for dictionary phrases in the content is based on the techniques used 
 
 ###Extraction Types
 
-Each dictionary can have one of the following extraction types:
+Each dictionary can have one of the following 4 extraction types:
 
-* *None* (or null type): Just search for the phrases. This is mainly used for Tagging documents.
-* *Number*: Search for the phrases AND a number in proximity to the phrase.
-* *Date*: Search for the phrases AND a date in proximity to the phrase.
-* *Regex*: Search for the phrases AND a custom regular expression in proximity to the phrase.
+1. *None* (or null type): Just search for the phrases. This is mainly used for Tagging documents.
+2. *Number*: Search for the phrases AND a number in proximity to the phrase.
+3. *Date*: Search for the phrases AND a date in proximity to the phrase.
+4. *Regex*: Search for the phrases AND a custom regular expression in proximity to the phrase.
 
 Dictionary phrases and Numbers or dates or regular expressions must appear in semantic order, either in a sentence or in a table. By default the phrase and the type should appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
 
