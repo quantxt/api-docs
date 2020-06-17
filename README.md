@@ -29,7 +29,7 @@ Dictionary phrases and Numbers or dates or regular expressions must appear in se
 | Input | Dictionary Phrase List | Extraction Type | Output |
 |-------|------------|-----------------|--------|
 |Subscription revenue was $201.5 million , an increase of 36% year-over-year.| Subscription revenue | Number | `201,500,000`|
-| <table><tr><td>Activity Date</td><td>Due Date</td></tr></table>| Activity Date | Date | `201,500,000`|
+| <table><tr><td>Activity Date</td><td>Due Date</td><td>Amount</td></tr><tr><td>July 25, 2019</td><td>October 23, 2010</td><td>$117,000</td></tr> </table>| Activity Date | Date | `07/25/2019`|
 
 
 In the following we cover details of configuring and submitting extraction jobs via a RESTful API. 
