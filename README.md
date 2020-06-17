@@ -47,11 +47,10 @@ In the following we cover details of configuring and submitting extraction jobs 
   - [Update an Existing Dictionary](#update-an-existing-dictionary)
   - [Delete a Dictionary](#delete-a-dictionary)
   - [List Available Dictionaries](#list-available-dictionaries)
-- [Extraction and Mining](#extraction-and-mining)
-  - [Mining Content Files](#mining-content-files)
-  - [Mining Web URLs](#mining-web-urls)
-  - [Mining Data Streams](#mining-data-streams)
-  - [Extracting Typed Entities](#extracting-typed-entities)
+- [Data Extraction](#data-extraction)
+  - [Extraction Files](#extraction-from-files)
+  - [Extraction from Web URLs](#extraction-from-web-urls)
+  - [Extraction from Data Streams](#extraction-from-data-streams)
   - [Status Monitoring](#status-monitoring)
 - [Searching in the Results](#searching-in-the-results)
 - [Exporting the Results](#exporting-the-results)
@@ -81,41 +80,36 @@ If API key is missing or not valid the endpoint will return `HTTP 401`:
 }
 ```
 
-
-"Net Revenue" is a Typed Entity:
-
-```
-"Apple reported of net revenue of $53.3 billion in 2018."
-```
-
-"Net Revenue" is not a Typed Entity:
-
-```
-"Tim Cook will go over net revenue of Apple in the upcoming conference call."
-```
-
-
 ### Dictionaries
 
-Dictionaries are simply a list of phrases that are. Each item of a dictionary has a `str` and a `category`. The `str` is a search phrase and the `category` is the actual word or phrase that represents the entity.
+Dictionaries are a list of phrases used for searching in input documents. Each entry of a dictionary has a `str` and an optional `category`.  Once a phrase is found **Theia** produces an extraction object:
 
-**Theia** scans all input utterances for every word or phrase in the dictionary and, if found, map it to the associated value:
+```json
+{
+	"start": 6188,
+	"end": 6196,
+	"str": "sales of equipment",
+	"line": 309,
+	"category": "Sales",
+	"dict_name": "Revenue",
+	"dict_id": "92e7e423-304a-421c-a612-b6dc4215fd09",
+}
+```
+`str` is the found phrase.
+`start`, `end` and `line` are the positions of the found phrase.
+`category` (optional) and is only produced if the found phrase was associated with a category.
+`dict_name` assigned by user when creating a dictionary
+`dict_id` returned by **Theia** once a dictionary is created.
 
-Dictionary (one item):
-```merger and acquisition => M&A```
+The `str` is a search phrase and the `category` is the actual word or phrase that represents the entity.
 
-Input utterance:
-
->Merger and acquisitions report published in 2019.
-
-The above will be labeled with `M&A`
 
 **Theia** uses various strategies for matching on dictionary phrases allowing users to configure the fuzziness of search. User can also provide a list synonyms and stop phrases for the value matching. For example, user can only have "Apple Inc" as one phrase in the dictionary and provide "inc", "corp", "corporation" and "company" as synonyms, allowing you to find all occurrences of "Apple the Company", "Apple Corporations" and "Apple Corp" in the content.
 
 
-Entity dictionaries can be created in two ways: 
+Dictionaries can be created in two ways: 
 - By providing dictionary entries in the request payload
-- By uploading a TSV file containing dictionary entries in the format of `key<TAB>value`.
+- By uploading a TSV file
 
 
 #### Create A New Dictionary
@@ -126,20 +120,20 @@ Create data dictionaries via `/dictionaries` end point as follows:
 
 ```
 curl -X POST \
-  http://search.api.quantxt.com/dictionaries \
+  http://api.quantxt.com/dictionaries \
   -H 'X-Api-Key: API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
-	"name": "My dictionary",
+	"name": "M&A",
 	"entries": 
 	[
 		{
-			"key": "M&A",
-			"value": "merger and acquisition"
+			"category": "Take Overs",
+			"str": "merger and acquisition"
 		},
 		{
-			"key": "M&A",
-			"value": "take over"
+			"category": "Take Overs",
+			"str": "take over"
 		}
 	]
 }'
@@ -151,18 +145,9 @@ curl -X POST \
 ```
 {
     "id": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
-    "key": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-    "name": "My dictionary",
+    "name": "M&A",
     "global": false,
     "entries": [
-        {
-          "key": "M&A",
-          "value": "merger and acquisition"
-        },
-        {
-          "key": "M&A",
-          "value": "take over"
-        }
     ]
 }
 ```
@@ -177,20 +162,20 @@ Upload TSV data dictionaries via `/dictionaries/upload` endpoint as follows:
 
 ```
 curl -X POST \
-  http://search.api.quantxt.com/dictionaries/upload \
+  http://api.quantxt.com/dictionaries/upload \
   -H 'X-Api-Key: API_KEY' \
   -F 'name=Uploaded dictionary' \
   -F file=@/home/files/custom_dictionary.tsv
 ```
 
 
-To retrieve an available dictionary perform the request below, by providing the dictionary ID:
+#### Fetch an existing dictionary:
 
 #### Request
 
 ```
 curl -X GET \
- http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+ http://api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
  -H 'X-Api-Key: API_KEY'
 ```
 
@@ -203,7 +188,7 @@ To update an existing dictionary:
 
 ```
 curl -X PUT \
-  http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+  http://api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
   -H 'X-Api-Key: API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -211,12 +196,12 @@ curl -X PUT \
 	"entries": 
 	[
 		{
-			"key": "TBD",
-			"value": "To be done"
+			"category": "TBD",
+			"str": "To be done"
 		},
 		{
-			"key": "TBD",
-			"value": "To be decided"
+			"category": "TBD",
+			"str": "To be decided"
 		}
 	]
 }'
@@ -230,7 +215,7 @@ To delete an existing dictionary:
 
 ```
 curl -X DELETE \
-  http://search.api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
+  http://api.quantxt.com/dictionaries/58608b0f-a0ff-45d0-b12a-2fb93af1a9ad \
   -H 'X-Api-Key: API_KEY'
 ```
 
@@ -243,7 +228,7 @@ To list all your existing dictionaries:
 
 ```
 curl -X GET \
-  http://search.api.quantxt.com/dictionaries \
+  http://api.quantxt.com/dictionaries \
   -H 'X-Api-Key: API_KEY'
 ``` 
 
@@ -253,7 +238,6 @@ curl -X GET \
 [
     {
         "id": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
-        "key": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
         "name": "My dictionary",
         "global": false,
         "entries": []
@@ -262,25 +246,25 @@ curl -X GET \
 ```
 
 
-### Extraction and Mining
+### Data Extraction
 
-Data Extraction and Mining is the process of identifying entities found in the unstructured content using entity dictionaries and formatting it into structured format. Unstructured data can be streamed from content files, data APIs or directly from public URLs.
+Data Extraction is the process of identifying search phrases found in the input documents along with extraction types (date, number or regex) using dictionaries and formatting it into structured format. Input documents can be streamed from content files, data APIs or directly from public URLs.
 
 
-#### Mining Content Files
+#### Extraction from Files
 
-First, upload all content files for tagging via the following call:
+Files are needed to be uploaded first:
 
 #### Request
 
 ```
 curl -X POST \
-  http://search.api.quantxt.com/search/file \
+  http://api.quantxt.com/search/file \
   -H 'X-Api-Key: API_KEY' \
   -F file=@/Users/file.pdf
 ```
 
-PDF, TXT and HTML formats are supported.
+PDF, TXT, XLS, XLSX, CSV and HTML formats are supported.
 
 #### Response
 
@@ -295,13 +279,13 @@ PDF, TXT and HTML formats are supported.
 }
 ```
 
-Then you can mine data via dictionaries:
+`uuid`s along with dictionaries are provided for the exraction engine.
 
 #### Request
 
 ```
 curl -X POST \
-  http://search.quantxt.com/search/new \
+  http://quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -309,16 +293,18 @@ curl -X POST \
   "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
   "searchDictionaries": [
         { 
-            "vocabPath": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-            "vocabValueType": "NONE"
+            "vocabId": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
+            "vocabValueType": "NUMBER"
         }
   ]
 }'
 ```
 
-`title` is optional but it is highly recommended for easier distinction between different tagging jobs.
+`vocabId` (required) id of the dictionary
 
-`vocabValueType` can have one of the following values: `NONE`, `STRING`, `DOUBLE`, `DATETIME`, 
+`title` (optional) but it is highly recommended for easier distinction between different tagging jobs.
+
+`vocabValueType` (optional) and can be one of the following values: `NUMBER`, `DATETIME`, `REGEX`
 
 **There is no limit on the number of files and dictionaries that can be processed via `/new` end-point.**
 
@@ -326,42 +312,27 @@ curl -X POST \
 
 ```
 {
-    "index": "puvqrjfhqq",
+    "id": "puvqrjfhqq",
     "title": "My data mining with files and dictionaries",
-    "get_phrases": true,
-    "maxTokenPerUtt": 35,
-    "minTokenPerUtt": 6,
-    "excludeUttWithoutEntities": false,
-    "stitle": null,
+    "excludeUttWithoutEntities": true,
     "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
     "searchDictionaries": [
         { 
-            "vocabPath": "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-            "vocabValueType": "NONE"
+            "vocabPath": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
+            "vocabValueType": "NUMBER"
         }
     ]
 }
 ```
 
-`index` represents the unique identification for the container that holds output labeled data. 
+`id` is the extraction job id. You can use it to monitor satus of the job or retrieve the results once completed.
 
 
 **Request parameters:**
 
 `chunk`
-(Optional, string) can be `SENTENCE` or `PARAGRAPH` or `NONE`. This will result in splitting data into semantic chunks before processing. For example, this allow user to split the content of an article in semantic sentences and apply entity dictionaries at sentence level.
+(Optional, string) can be `SENTENCE` or `PAGE` or `NONE`. This will result in splitting data into semantic chunks before processing. For example, this allow user to split the content of an article in semantic sentences and apply entity dictionaries at sentence level.
 
-`excludeUttWithoutEntities`
-(Optional, boolean) if `true` the output only includes chunks that have at least one label from the input dictionaries.
-
-`get_phrases`
- (Optional, boolean) if `true` auto tagging will be performed.
- 
-`minTokenPerUtt` (Optional, int)
- 
-`maxTokenPerUtt` (Optional, int) 
-
-`stitle` (Optional, string) Override command.
 
 To delete a data container:
 
@@ -369,12 +340,12 @@ To delete a data container:
 
 ```
 curl -X DELETE \
-  http://search.api.quantxt.com/search/puvqrjfhqq \
+  http://api.quantxt.com/search/puvqrjfhqq \
   -H 'X-Api-Key: API_KEY'
 ```
 
 
-#### Mining Web URLs:
+#### Extraction from Web URLs:
 
 Mining can be performed on a list of URLs. All parameters in tagging files are applicable here.
 
@@ -382,7 +353,7 @@ Mining can be performed on a list of URLs. All parameters in tagging files are a
 
 ```
 curl -X POST \
-  http://search.quantxt.com/search/new \
+  http://quantxt.com/search/new \
   -H 'X-Api-Key: API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -395,77 +366,10 @@ curl -X POST \
 
 **Theia can process both static and dynamic web pages. However, a number of websites build mechanisms to block internet bots. Theia built-in Web parser is not designed to bypass such blocking mechanisms**
 
-#### Mining Data Streams
+#### Extraction from Data Streams
 
-Tagging data from data streams such as third party APIs is supported. Please contact <support@quantxt.com> for details.
+Extraction data from streams or third party data APIs is supported. Please contact <support@quantxt.com> for details.
 
-
-#### Extracting Typed Entities
-
-Entity dictionaries allow the user to quickly search and label thousands of phrases in unstructured content. There are cases when users want to label a keyword or phrase as an entity only if it is associated with a value. For example:
-
-A "release => "Manufactured" dictionary item will label both of the following utterances:
-
-> The first automobile in the US **released** by Ford
-> The first automobile in the US **released** in 1908 by Ford
-
-However, if the user is looking for only release year of the car makers the first utterance won't have much use for him. He can only label the second utterance using a **Typed Entities**.
-
-Supported types for associated entities are:
-
-`REGEX`, `DOUBLE`, `DATETIME`
-
-types are passed via `vocabValueType` parameter.
-
-If a Type is set, a dictionary item will be extracted only if a type is found in its close proximity.
-In the above example, user can set *vocabValueType* in the request to `DOUBLE` to identify **1908** only if it is associated with the entity **released**
-
-#### Request
-
-```
-curl -X POST \
-  http://search.api.quantxt.com/search/new \
-  -H 'X-Api-Key: API_KEY' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "title": "My search with dictionaries and types",
-  "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
-  "searchDictionaries": [
-    {
-      "vocabPath" : "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-      "vocabValueType": "DOUBLE"
-    }
-  ]
-}'
-```
-
-`vocabPath` (Required): The path to entity dictionary. Path is returned either after creation of a new dictionary or via listing existing dictionaries.
-
-`vocabValueType` (Optional): If set, the engine will extract only entities that are associated with a entity of this type.
-
-To make Theia extract entities using a regular expression *vocabValueType* needs to be set to `REGEX`. You also need to provide the actual regular expression as well as the capturing groups:
-
-
-#### Request
-
-```
-curl -X POST \
-  http://search.api.quantxt.com/search/new \
-  -H 'X-Api-Key: API_KEY' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "title": "My search with dictionaries and types",
-  "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
-  "searchDictionaries": [
-    {
-      "vocabPath" : "user-example-com/58608b1f-a0ff-45d0-b12a-2fb93af1a9ad.csv.gz",
-      "vocabValueType": "REGEX",
-      "phraseMatchingPattern": "([A-Z]{3})\\-([A-Z0-9]+)(\\d)",
-      "phraseMatchingGroups": ["1" , "3"]
-    }
-  ]
-}'
-```
 
 #### Status Monitoring
 
@@ -475,7 +379,7 @@ The Progress endpoint allows user to check the progress of a submitted data mini
 
 ```
 curl -X GET
-    http://search.api.quantxt.com/search/progress \
+    http://api.quantxt.com/search/progress \
     -H 'X-Api-Key: API_KEY'
 ```
 
@@ -505,7 +409,7 @@ It is also possible to check the progress of a specific data mining job:
 
 ```
 curl -X GET
-    http://search.api.quantxt.com/search/progress/cjaejhvtao \
+    http://api.quantxt.com/search/progress/cjaejhvtao \
     -H 'X-Api-Key: API_KEY'
 ```
 
@@ -529,7 +433,7 @@ The Search endpoint allows user to run full-text and [faceted search](https://en
 
 ```
 curl -X GET \
-  http://search.api.quantxt.com/search/puvqrjfhqq \
+  http://api.quantxt.com/search/puvqrjfhqq \
   -H 'X-Api-Key: API_KEY'
 ```
 
@@ -558,7 +462,6 @@ curl -X GET \
             "title": "The Federal Reserve Bank of New York provides gold custody to several central banks, governments and official international organizations on behalf of the Federal Reserve System.",
             "id": "Wv8fBG4Bc3WI8L9MbaO2",
             "link": "https://www.hamilton.edu/news/story/hamilton-nyc-program-tours-federal-reserve-museum",
-            "score": 0.10268514747565982,
             "source": "abc15.com",
             "date": "2018-05-24T00:00:00.000Z",
             "tags": [
@@ -596,7 +499,7 @@ Results can also be exported in XLSX format by performing `GET` requests to:
 
 ```
 curl -X GET
-    http://search.api.quantxt.com/reports/puvqrjfhqq/xlsx \
+    http://api.quantxt.com/reports/puvqrjfhqq/xlsx \
     -H 'X-Api-Key: API_KEY'
 ```
 
@@ -608,7 +511,7 @@ The output which is in binary must be saved in ".xlsx" format.
 
 ```
 curl -X GET
-    http://search.api.quantxt.com/reports/puvqrjfhqq/json \
+    http://api.quantxt.com/reports/puvqrjfhqq/json \
     -H 'X-Api-Key: API_KEY'
 ```
 
