@@ -1,9 +1,9 @@
 ## Theia API documentations; Overview and Definitions
 
 
-**Theia** is a semantic data extraction tool. Theia can read PDF, Ms Excel, CSV and plain text documents and extract information using extraction dictionaries. In the following we cover details of configuring and submitting extraction jobs via a RESTful API. 
+**Theia** is a semantic data extraction tool. Theia can read PDF, Ms Excel, CSV and plain text documents and extract information using _dictionaries_. It is important to understand dictionaries and their utility in extraction context:
 
-***Dictionary***
+###Dictionary
 
 In the simplest case, a dictionary is a list of phrases. Theia search for every phrase in the dictionary in the input documents and based on the extraction type results decide to extract information. 
 At a minimum, a dictionary must have a Name and at least one entry (one search phrase).
@@ -12,16 +12,19 @@ Users can also assign categories to dictionary entries.
 Searching for dictionary phrases in the content is based on the techniques used in modern search engines. Users can use various text analyzers, synonyms, stop words and fuzziness. All of this will be explained in the examples.
 
 
-***Extraction Types***
+###Extraction Types
 
 Each dictionary can have one of the following extraction types:
 
-* None (or null type): Just search for the phrases. This is mainly used for Tagging documents.
-* Number: Search for the phrases AND a number in proximity to the phrase.
-* Date: Search for the phrases AND a date in proximity to the phrase.
-* Regex: Search for the phrases AND a custom regular expression in proximity to the phrase.
+* *None* (or null type): Just search for the phrases. This is mainly used for Tagging documents.
+* *Number*: Search for the phrases AND a number in proximity to the phrase.
+* *Date*: Search for the phrases AND a date in proximity to the phrase.
+* *Regex*: Search for the phrases AND a custom regular expression in proximity to the phrase.
 
 Dictionary phrases and Numbers or dates or regular expressions must appear in semantic order, either in a sentence or in a table. By default the phrase and the type should appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
+
+
+In the following we cover details of configuring and submitting extraction jobs via a RESTful API. 
 
 
 ## Table of content
