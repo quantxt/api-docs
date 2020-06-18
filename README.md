@@ -1,4 +1,4 @@
-# Theia REST API documentations; 
+# Theia REST API documentations
 
 ## Overview and Definitions
 
