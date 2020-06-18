@@ -1,5 +1,6 @@
-## Theia API documentations; Overview and Definitions
+# Theia REST API documentations; 
 
+## Overview and Definitions
 
 **Theia** is a semantic data extraction tool that can read PDF, HTML, Ms Excel, CSV and plain text documents and extract information in structured format using _dictionaries_. It is essential to understand the utility of _dictionaries_ in extraction context:
 
