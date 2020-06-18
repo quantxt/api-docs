@@ -5,11 +5,11 @@
 
 ### Dictionary
 
-In the simplest case, a dictionary is a list of phrases. Theia search for every phrase in the dictionary in the input documents and based on the extraction type results decide to extract information. 
-At a minimum, a dictionary must have a Name and at least one entry (one search phrase).
+In the simplest case, a dictionary is a list of phrases. Theia searches for every phrase in the dictionary in the input documents and based on the _extraction type_ decides to extract data. 
+At a minimum, a dictionary must have a Name and at least one entry, one search phrase.
 Users can also assign categories to dictionary entries. 
 
-Searching for dictionary phrases in the content is based on the techniques used in modern search engines. Users can use various text analyzers, synonyms, stop words and fuzziness. All of this will be explained in the examples.
+Searching for dictionary phrases in the content is based on the techniques used in modern full-text search engines. Users can use various text analyzers, synonyms, stop words and fuzziness.
 
 
 ### Extraction Types
@@ -21,7 +21,7 @@ Each dictionary can have one of the following 4 extraction types:
 3. **Date**: Search for the phrases AND a date in proximity to the found phrases.
 4. **Regex**: Search for the phrases AND a custom regular expression in proximity to the found phrases.
 
-Dictionary phrases and types must appear in semantic order, either in a sentence or in a table. By default **Theia** expects the phrase and the type to appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
+Search phrases and types should appear in reading order, either in a sentence or in a table. By default **Theia** expects the phrase and the type to appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
 
 
 ### Examples
@@ -35,7 +35,7 @@ Gas Consumption is 23.1 L per 100km| Consumption | Regex ([\d\\.]+) .*?100km| `2
 The car consumes 24 litre of gas per 100km| Consumption | Regex ([\d\\.]+) .*?100km| `24`|
 
 
-In the following we cover details of configuring and submitting extraction jobs via a RESTful API. 
+In the following we cover details of configuring and submitting extraction jobs via our REST API. Extensive end-to-end examples can be found in our Java and Python SDK repositories.
 
 
 ## Table of content
