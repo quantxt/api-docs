@@ -36,7 +36,7 @@ Gas Consumption is 23.1 L per 100km| Consumption | Regex ([\d\\.]+) .*?100km| `2
 The car consumes 24 litre of gas per 100km| Consumption | Regex ([\d\\.]+) .*?100km| `24`|
 
 
-In the following we cover details of configuring and submitting extraction jobs via our REST API. Extensive end-to-end examples can be found in our Java and Python SDK repositories.
+In the following we will cover the details of configuring and submitting extraction jobs via our REST API. Extensive end-to-end examples can be found in our Java and Python SDK repositories.
 
 
 ## Table of content
