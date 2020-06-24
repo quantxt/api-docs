@@ -17,10 +17,11 @@ Searching for dictionary phrases in the content is based on the techniques used 
 
 Each dictionary can have one of the following 4 extraction types:
 
-1. **None** (or null type): Just search for the phrases and mark them if found. This is mainly used for Tagging documents.
-2. **Number**: Search for the phrases AND a number in proximity to the found phrases.
-3. **Date**: Search for the phrases AND a date in proximity to the found phrases.
-4. **Regex**: Search for the phrases AND a custom regular expression in proximity to the found phrases.
+1. **Number**: Search for the phrases AND a number in proximity to the found phrases.
+2. **Date**: Search for the phrases AND a date in proximity to the found phrases.
+3. **Regex**: Search for the phrases AND a custom regular expression in proximity to the found phrases.
+4. **None** (or null type): Just search for the phrases and mark them if found. This is mainly used for Tagging documents.
+
 
 Search phrases and types should appear in reading order, either in a sentence or in a table. By default **Theia** expects the phrase and the type to appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
 
