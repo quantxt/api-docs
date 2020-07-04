@@ -54,7 +54,7 @@ In the following we will cover the details of configuring and submitting extract
   - [Processing Web URLs](#processing-web-urls)
   - [Processing Data Streams](#processing-data-streams)
   - [Status Monitoring](#status-monitoring)
-  - [Re-use Extraction Pipelines](#reuse-extraction-pipelines)
+  - [Re-Use Data Processing Pipelines](#re-use-data-processing-pipelines)
 - [Searching in the Results](#searching-in-the-results)
 - [Exporting the Results](#exporting-the-results)
   -[Exporting in Excel Format](#exporting-in-excel-format)
@@ -433,10 +433,36 @@ curl -X GET
 }
 ```
 
-#### Re-use Extraction Pipelines
+#### Re-Use Data Processing Pipelines
 
-A project is essentially a data processing pipeline. Once a project is completed, user can re-use the data processing piepline to process more documents. 
+A project is essentially a collection of data dictionaries along with extraction parameters. Once a project is completed, user can re-use the data processing piepline to process more documents. 
 User can either append more documents to a current project or clone the project into a new project and process new documents.
+
+To append fresh data to an already completed project:
+
+#### Request
+
+```
+curl -X GET
+    http://api.quantxt.com/search/update/cjaejhvtao \
+    -H 'X-Api-Key: API_KEY'
+    "files": ["uuid_1", "uuid_2"],
+```
+
+The above will use dictionaries and extraction parameters from `cjaejhvtao` project to process `uuid_1` and `uuid_2`. The call will return `cjaejhvtao` as `id`. and results will then be appended to `cjaejhvtao`
+
+
+To clone a project and process fresh data:
+
+
+```
+curl -X GET
+    http://api.quantxt.com/search/new/cjaejhvtao \
+    -H 'X-Api-Key: API_KEY'
+    "files": ["uuid_1", "uuid_2"],
+```
+
+The above will use dictionaries and extraction parameters from `cjaejhvtao` project to process `uuid_1` and `uuid_2`. The call above will return a new `id`.
 
 
 ### Searching in the Results
