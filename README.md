@@ -50,10 +50,11 @@ In the following we will cover the details of configuring and submitting extract
   - [Delete a Dictionary](#delete-an-existing-dictionary)
   - [List Existing Dictionaries](#list-existing-dictionaries)
 - [Data Extraction](#data-extraction)
-  - [Extraction Files](#extraction-from-files)
-  - [Extraction from Web URLs](#extraction-from-web-urls)
-  - [Extraction from Data Streams](#extraction-from-data-streams)
+  - [Processing Files](#processing-files)
+  - [Processing Web URLs](#processing-web-urls)
+  - [Processing Data Streams](#processing-data-streams)
   - [Status Monitoring](#status-monitoring)
+  - [Re-use Extraction Pipelines](#reuse-extraction-pipelines)
 - [Searching in the Results](#searching-in-the-results)
 - [Exporting the Results](#exporting-the-results)
   -[Exporting in Excel Format](#exporting-in-excel-format)
@@ -251,7 +252,7 @@ curl -X GET \
 Data Extraction is the process of identifying search phrases found in the input documents along with extraction types (date, number or regex) and producing structured data. Input documents can be streamed from content files, data APIs or directly from public URLs.
 
 
-#### Extraction from Files
+#### Processing Files
 
 Files are needed to be uploaded first:
 
@@ -264,7 +265,7 @@ curl -X POST \
   -F file=@/Users/file.pdf
 ```
 
-PDF, TXT, XLS, XLSX, CSV and HTML formats are supported.
+PDF, TXT, XLS, XLSX, CSV and HTML formats are supported. Image documents, such as TIFF, PNG or scanned PDF, will automatically run through OCR before data extraction.
 
 #### Response
 
@@ -305,7 +306,9 @@ curl -X POST \
 
 `title` (optional) but it is highly recommended for distinction between different jobs.
 
-`vocabValueType` (optional) and can be `NUMBER` or `DATETIME` or `REGEX`. If `REGEX` is set user needs to provide the look up regular expression via `phraseMatchingPattern`. The following pattern matches on social securities numbers:
+`vocabValueType` (optional) is the extraction type and can be `NUMBER` or `DATETIME` or `REGEX`. If no extraction type is set, the dictionary will be used for tagging documents.
+
+If `REGEX` is set user will also need to provide the look up regular expression via `phraseMatchingPattern`. The following pattern matches on social securities numbers:
 
 ```json
 { 
@@ -325,7 +328,7 @@ curl -X POST \
     "files": ["c351283c-330c-418b-8fb7-44cf3c7a09d5"],
     "searchDictionaries": [
         { 
-            "vocabPath": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
+            "vocabId": "58608b1f-a0ff-45d0-b12a-2fb93af1a9ad",
             "vocabValueType": "NUMBER"
         }
     ]
@@ -353,7 +356,7 @@ curl -X DELETE \
 ```
 
 
-#### Extraction from Web URLs:
+#### Processing Web URLs:
 
 Mining can be performed on a list of URLs. All parameters in tagging files are applicable here.
 
@@ -375,9 +378,9 @@ curl -X POST \
 **Theia can process both static and dynamic web pages. However, a number of websites build mechanisms to block internet bots. Theia built-in Web parser is not designed to bypass such blocking mechanisms**
 
 
-#### Extraction from Data Streams
+#### Processing Data Streams
 
-Extraction data from streams or third party data APIs is supported. Please contact <support@quantxt.com> for details.
+Extraction data from streams or third party data APIs is supported. For example, user can stream documents directly from Amazon S3, Google Drive, DropBox and many other document repositories that are available via an API. Please contact <support@quantxt.com> for details.
 
 
 #### Status Monitoring
@@ -429,6 +432,11 @@ curl -X GET
     "progress_msg": "Collecting data..."
 }
 ```
+
+#### Re-use Extraction Pipelines
+
+A project is essentially a data processing pipeline. Once a project is completed, user can re-use the data processing piepline to process more documents. 
+User can either append more documents to a current project or clone the project into a new project and process new documents.
 
 
 ### Searching in the Results
