@@ -6,22 +6,23 @@
 
 ### Dictionary
 
-In the simplest case, a dictionary is a list of phrases. Theia searches for every phrase in the dictionary in the input documents and based on the _extraction type_ decides to extract data. 
-At a minimum, a dictionary must have a Name and at least one entry, one search phrase.
+Dictionary is a list of keyword or phrases representing one or more variation for a field name. Theia looks up all the dictionary items in input documents and based on the _extraction pattern_ decides to extract data. 
+At a minimum, a dictionary must have a Name and at least one entry.
+
 Users can also assign categories to dictionary entries. 
 
 Searching for dictionary phrases in the content is based on the techniques used in modern full-text search engines. Users can use various text analyzers, synonyms, stop words and fuzziness.
 
 
-### Extraction Types
+### Extraction Patterns
 
-Each dictionary can have one optional extraction type:
+Each dictionary should be associated with an extraction pattern. Patterns are resular expressions. Theia finds matches for the regular expression in proximity to the phrases in the dictionary. Extraction patterns can be:
 
-1. **Number**: Search for the phrases AND a number in proximity to the found phrases.
-2. **Date**: Search for the phrases AND a date in proximity to the found phrases.
-3. **Regex**: Search for the phrases AND a custom regular expression in proximity to the found phrases.
+1. **Number**: A generic number.
+2. **Date**: A generic date.
+3. **Regex**: A custom pattern. The actual pattern must be provided by the user.
 
-Without setting an extraction type the dictionary will essentially be used for tagging documentnts.
+Without setting an extraction pattern the dictionary will essentially be used for tagging documentnts.
 
 Search phrases and types should appear in reading order, either in a sentence or in a table. By default **Theia** expects the phrase and the type to appear close (but not necessarily next) to each other. Users can configure the allowable gap between dictionary phrases and types using regular expressions.
 
