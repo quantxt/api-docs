@@ -45,12 +45,18 @@ the defined settings. Each strategy has 5 parameters:
 |`fuzzy_length` | Minimum word length for fuzzy matching Default is 3.| Integer >=0 |No|
 
 
-#### Mode ####
+#### `mode` ####
 
 `SPAN` : Match on all keywords  <br />
 `PARTIAL_SPAN` : Match on at least one keyword  <br />
 `PARTIAL_FUZZY_SPAN` : Fuzzy-Match on at least one keyword  <br />
 
+
+#### `analyzType` ####
+
+`STEM` : Convert keywords into stems: Builders, BuIlDings, Builds and Built all become buil <br />
+`SIMPLE` : Remove non-Ascii characters and punctuations from the words. Year:2019 becomes year 2019
+`WHITESPACE` Preserve all words as they appear, no lower casing or removal of any ascii or non-ascii characters
 
 ### Query an existing Model
 
