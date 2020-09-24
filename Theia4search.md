@@ -13,11 +13,10 @@ Each row in the input CSV is considered one instance. Each row must have an inte
 | --------- | ---- | -------- | ---------|
 |`c` | Model unique identifier | Request Parameter| Yes|
 |`file` | Input CSV data file | Request Parameter |Yes|
-|`cols` | Comma separated columns from the CSV input that needs to be searchable | Request Parameter|Yes|
-|`thresh` | Search score threshold. Default is 0. | Request Parameter| No|
+|`config` | Search configuration in string Json format |No|
+|`thresh` | Search score threshold. Default is 0. | Request Parameter|No|
 |`fuzzy_length` | Minimum word length for fuzzy matching Default is 3.| Request Parameter |No|
 |`stoplist` | Input stop word file | Request Parameter |No|
-|`conceptlist` | Input entity list file | Request Parameter |No|
 |`synonym` | Input synonym file | Request Parameter |No|
 
 &nbsp;
@@ -30,6 +29,27 @@ User is responsible to provide a unique id (`c`) for the anticipated search engi
 First row of the inout CSV is skipped
 Column 0 must be the id or row number and is always returned in the search response
 Column 1 is reserved and can not be searchable.
+
+### Search Configuration ###
+
+You can configure multiple strategies for searching the content. Each strategy reads content from one of the inout CSV columns and index them using
+the defined settings. Each strategy has 5 parameters:
+
+
+| Parameter | Description | Possible Values |Required |
+| --------- | ---- | -------- | ---------|
+|`input_col` | 0-based column index in input CSV | Integer >=2| Yes|
+|`mode` | Full-Text search mode| `SPAN` `PARTIAL_SPAN` `PARTIAL_FUZZY_SPAN` | Yes|
+|`analyzType` | Text processing method| `STEM` `SIMPLE` `WHITESPACE` | Yes|
+|`thresh` | Search score threshold. Default is 0. | Float >=0|No|
+|`fuzzy_length` | Minimum word length for fuzzy matching Default is 3.| Integer >=0 |No|
+
+
+#### Mode ####
+
+`SPAN` : Match on all keywords
+`PARTIAL_SPAN` : Match on at least one keyword
+`PARTIAL_FUZZY_SPAN` : Fuzzy-Match on at least one keyword
 
 
 ### Query an existing Model
@@ -44,17 +64,6 @@ Column 1 is reserved and can not be searchable.
 &nbsp;
 &nbsp;
 
-### Word frequencies for an existing model
-
-
-**GET** `/v2/{id}/wfl`
-
-| Parameter | Description | Type |Required |
-| --------- | ---- | -------- | ---------|
-|`id` | Model unique identifier | Path Parameter| Yes|
-
-&nbsp;
-&nbsp;
 
 ### Load All existing model files
 **GET** `/v2/load`
