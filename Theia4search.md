@@ -47,9 +47,9 @@ the defined settings. Each strategy has 5 parameters:
 
 #### Mode ####
 
-`SPAN` : Match on all keywords
-`PARTIAL_SPAN` : Match on at least one keyword
-`PARTIAL_FUZZY_SPAN` : Fuzzy-Match on at least one keyword
+`SPAN` : Match on all keywords  <br />
+`PARTIAL_SPAN` : Match on at least one keyword  <br />
+`PARTIAL_FUZZY_SPAN` : Fuzzy-Match on at least one keyword  <br />
 
 
 ### Query an existing Model
