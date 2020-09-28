@@ -55,8 +55,8 @@ the defined settings. Each strategy has 5 parameters:
 #### `analyzType` ####
 
 `STEM` : Convert keywords into stems: Builders, BuIlDings, Builds and Built all become buil <br />
-`SIMPLE` : Remove non-Ascii characters and punctuations from the words. Year:2019 becomes year 2019
-`WHITESPACE` Preserve all words as they appear, no lower casing or removal of any ascii or non-ascii characters
+`SIMPLE` : Remove non-Ascii characters and punctuations from the words. Year:2019 becomes year 2019 <br />
+`WHITESPACE` Preserve all words as they appear, no lower casing or removal of any ascii or non-ascii characters <br />
 
 ### Query an existing Model
 
